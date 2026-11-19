@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>카카오테크캠퍼스 기록</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="description" content="카카오테크캠퍼스 부트캠프에서 학습한 기록과 산출물을 모아 둔 링크트리">
+<style>
+:root{
+  --bg:#f7f6f2; --surface:#ffffff; --surface-2:#f0eee8; --text:#1d1d1b; --muted:#66645e; --line:#e2dfd6;
+  --accent:#c2410c; --accent-soft:#fdeee4; --link:#9a3412;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151513; --surface:#1d1d1a; --surface-2:#262622; --text:#ecebe6; --muted:#a3a198; --line:#34332e;
+    --accent:#fb923c; --accent-soft:#3a2416; --link:#fdba74; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151513; --surface:#1d1d1a; --surface-2:#262622; --text:#ecebe6; --muted:#a3a198; --line:#34332e;
+  --accent:#fb923c; --accent-soft:#3a2416; --link:#fdba74; --shadow:none;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  font-size:16px;line-height:1.6;word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:640px;margin:0 auto;padding:40px 16px 56px}
+header{position:relative;margin-bottom:32px}
+h1{margin:0 0 8px;font-size:28px;line-height:1.3;letter-spacing:-.02em}
+.lead{margin:0;color:var(--muted);font-size:15px}
+.theme{position:absolute;top:0;right:0;width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;
+  border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--muted);cursor:pointer;padding:0}
+.theme:hover{color:var(--text)}
+.theme svg{width:16px;height:16px}
+.theme .sun{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .theme .sun{display:block}
+  :root:not([data-theme="light"]) .theme .moon{display:none}
+}
+:root[data-theme="dark"] .theme .sun{display:block}
+:root[data-theme="dark"] .theme .moon{display:none}
+section{margin-top:32px}
+.sec-head{display:flex;align-items:baseline;gap:10px;margin:0 0 4px}
+.sec-head h2{margin:0;font-size:20px;letter-spacing:-.01em}
+.badge{font-size:12px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:2px 9px;border-radius:99px}
+.sec-desc{margin:0 0 14px;color:var(--muted);font-size:14px}
+.sub-title{margin:20px 0 8px;font-size:13px;font-weight:700;color:var(--muted)}
+.list{display:flex;flex-direction:column;gap:10px}
+.card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--surface);
+  border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);
+  transition:transform .12s ease,border-color .12s ease}
+.card:hover{transform:translateY(-1px);border-color:var(--accent)}
+.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ico{flex:none;width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent);
+  display:inline-flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+.ico svg{width:20px;height:20px}
+.body{flex:1;min-width:0}
+.name{display:block;font-weight:700;font-size:15.5px;line-height:1.4}
+.meta{display:block;margin-top:2px;color:var(--muted);font-size:13px;line-height:1.5}
+.arrow{flex:none;color:var(--muted);width:18px;height:18px}
+.card:hover .arrow{color:var(--accent)}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;text-align:center}
+footer a{color:var(--link);text-decoration:underline;text-underline-offset:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <button class="theme" id="theme" type="button" aria-label="테마 전환" title="테마 전환">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+    <h1>나의 카카오테크캠퍼스 기록</h1>
+    <p class="lead">부트캠프 과정에서 학습한 기록과 프로젝트 산출물을 모아 둔 링크트리입니다.</p>
+  </header>
+
+  <section id="stage-1">
+    <div class="sec-head"><span class="badge">1단계</span><h2>에이전틱 AI 학습 노트</h2></div>
+    <p class="sec-desc">에이전트의 기초부터 실무 도구까지 네 편으로 정리한 학습 노트입니다.</p>
+    <div class="list">
+      <a class="card" href="1단계/agentic-ai-1-agent-basics.html" target="_blank" rel="noopener">
+        <span class="ico">Ⅰ</span>
+        <span class="body">
+          <span class="name">에이전트의 기초</span>
+          <span class="meta">에이전트, Tool과 Function Calling, 프롬프트 엔지니어링, 컨텍스트 엔지니어링과 하네스</span>
+        </span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
+      <a class="card" href="1단계/agentic-ai-2-agent-features.html" target="_blank" rel="noopener">
+        <span class="ico">Ⅱ</span>
+        <span class="body">
+          <span class="name">Kanana 클론 코딩</span>
+          <span class="meta">구조화된 출력, 툴 입력 검증과 SQLite, RAG, MCP와 A2A, 멀티에이전트, 에이전트 평가</span>
+        </span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
+      <a class="card" href="1단계/agentic-ai-3-gpt-transformer.html" target="_blank" rel="noopener">
+        <span class="ico">Ⅲ</span>
+        <span class="body">
+          <span class="name">GPT와 Transformer</span>
+          <span class="meta">딥러닝 기본 원리, Transformer 블록, GPT-2에서 현대 LLM까지, 모델 학습</span>
+        </span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
+      <a class="card" href="1단계/agentic-ai-4-tools-practice.html" target="_blank" rel="noopener">
+        <span class="ico">Ⅳ</span>
+        <span class="body">
+          <span class="name">도구와 실무</span>
+          <span class="meta">모델 선택과 조합, Claude Code와 Codex 활용, Git 협업, 주차별 실습, 현업 조언</span>
+        </span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <section id="stage-2">
+    <div class="sec-head"><span class="badge">2단계</span><h2>팀 프로젝트 산출물</h2></div>
+    <p class="sec-desc">프로젝트 레포와 문서, 서비스, 영상을 한곳에 모았습니다.</p>
+
+    <div class="sub-title">프로젝트 링크</div>
+    <div class="list">
+      <a class="card" href="https://ktc4-pusan-4.duckdns.org/" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+        <span class="body"><span class="name">서비스</span><span class="meta">개인사업자를 위한 종합소득세 경비 판정 서비스 PreeT</span></span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+      </a>
+      <a class="card" href="https://github.com/kakaotechcampus-4/ktc4-pusan-4" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span>
+        <span class="body"><span class="name">프로젝트 레포</span><span class="meta">GitHub</span></span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+      </a>
+      <a class="card" href="https://htmlpreview.github.io/?https://github.com/kakaotechcampus-4/ktc4-pusan-4/blob/develop/docs/site/index.html#" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg></span>
+        <span class="body"><span class="name">온보딩 문서</span><span class="meta">팀 위키 문서</span></span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+      </a>
+      <a class="card" href="https://kakaotechcampus-4.github.io/ktc4-pusan-4/mentor-guide/" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M9 8h6"/></svg></span>
+        <span class="body"><span class="name">사용 가이드 문서</span><span class="meta">서비스 사용 가이드</span></span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+      </a>
+      <a class="card" href="https://raindrop3.github.io/ktc4-pusan-4/" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4.5 19a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L14 9V3"/><path d="M7.5 15h9"/></svg></span>
+        <span class="body"><span class="name">AI 실험 기록</span><span class="meta">프로젝트 중 AI로 실험한 내용을 정리한 기록</span></span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+      </a>
+      <a class="card" href="https://app.notion.com/p/elice-track/40f2bb98425780638e93d06b692837cc?source=copy_link" target="_blank" rel="noopener">
+        <span class="ico">N</span>
+        <span class="body"><span class="name">노션</span><span class="meta">기획, 기술 문서</span></span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></svg>
+      </a>
+    </div>
+
+    <div class="sub-title">영상</div>
+    <div class="list">
+      <a class="card" href="2단계/홍보영상.mp4" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        <span class="body"><span class="name">홍보 영상</span><span class="meta">서비스 홍보 영상 | 4:52</span></span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
+      <a class="card" href="2단계/PreeT_사용가이드_영상.mp4" target="_blank" rel="noopener">
+        <span class="ico"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+        <span class="body"><span class="name">PreeT 사용 가이드 영상</span><span class="meta">서비스 사용 가이드 영상 | 1:43</span></span>
+        <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <footer>© 2026 <a href="https://github.com/RainDrop3" target="_blank" rel="noopener">RainDrop3</a> | 개인 학습 기록이며 공식 자료가 아닙니다.</footer>
+</div>
+<script>
+(function(){
+  var root=document.documentElement, key="ktc-log-theme";
+  try{var saved=localStorage.getItem(key); if(saved) root.setAttribute("data-theme",saved);}catch(e){}
+  document.getElementById("theme").addEventListener("click",function(){
+    var dark=root.getAttribute("data-theme")==="dark" ||
+      (!root.getAttribute("data-theme") && matchMedia("(prefers-color-scheme: dark)").matches);
+    var next=dark?"light":"dark";
+    root.setAttribute("data-theme",next);
+    try{localStorage.setItem(key,next);}catch(e){}
+  });
+})();
+</script>
+</body>
+</html>

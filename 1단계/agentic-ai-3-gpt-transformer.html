@@ -1,0 +1,1964 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ⅲ. GPT와 Transformer | 에이전틱 AI 학습 노트</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root{
+  --bg:#f7f6f2; --surface:#ffffff; --surface-2:#f0eee8; --text:#1d1d1b; --muted:#66645e; --line:#e2dfd6;
+  --accent:#c2410c; --accent-soft:#fdeee4; --link:#9a3412;
+  --tip:#0f766e; --tip-bg:#e6f4f1; --warn:#b45309; --warn-bg:#fdf3e1; --ex:#4338ca; --ex-bg:#eef0fd;
+  --sum:#be185d; --sum-bg:#fcebf3; --qa:#475569; --qa-bg:#eef1f5;
+  --code-bg:#f3f1ea; --dot1:#f3d6c4; --dot2:#e8955f; --dot3:#c2410c;
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151513; --surface:#1d1d1a; --surface-2:#262622; --text:#ecebe6; --muted:#a3a198; --line:#34332e;
+    --accent:#fb923c; --accent-soft:#3a2416; --link:#fdba74;
+    --tip:#5eead4; --tip-bg:#11302c; --warn:#fbbf24; --warn-bg:#33270f; --ex:#a5b4fc; --ex-bg:#1f2140;
+    --sum:#f9a8d4; --sum-bg:#3a1a2b; --qa:#cbd5e1; --qa-bg:#262b33;
+    --code-bg:#23231f; --dot1:#5a3a26; --dot2:#b5612d; --dot3:#fb923c;
+    --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151513; --surface:#1d1d1a; --surface-2:#262622; --text:#ecebe6; --muted:#a3a198; --line:#34332e;
+  --accent:#fb923c; --accent-soft:#3a2416; --link:#fdba74;
+  --tip:#5eead4; --tip-bg:#11302c; --warn:#fbbf24; --warn-bg:#33270f; --ex:#a5b4fc; --ex-bg:#1f2140;
+  --sum:#f9a8d4; --sum-bg:#3a1a2b; --qa:#cbd5e1; --qa-bg:#262b33;
+  --code-bg:#23231f; --dot1:#5a3a26; --dot2:#b5612d; --dot3:#fb923c;
+  --shadow:none;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:16px}
+body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,sans-serif;
+  font-size:16px;line-height:1.75;word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline}
+code,pre{font-family:"D2Coding","JetBrains Mono",Consolas,ui-monospace,monospace;font-size:.88em}
+.layout{display:grid;grid-template-columns:270px minmax(0,1fr);max-width:1260px;margin:0 auto}
+/* sidebar */
+.side{position:sticky;top:0;height:100vh;overflow:auto;padding:28px 18px 28px 24px;border-right:1px solid var(--line)}
+.side .brand{font-weight:800;font-size:15px;letter-spacing:-.01em;margin-bottom:4px}
+.brand-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.brand-row .brand{margin-bottom:0}
+.theme-ico{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;padding:0;border-radius:7px;color:var(--muted);flex:none}
+.theme-ico:hover{color:var(--text)}
+.theme-ico svg{width:15px;height:15px}
+.theme-ico .sun{display:none}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .theme-ico .sun{display:block}
+  :root:not([data-theme="light"]) .theme-ico .moon{display:none}
+}
+:root[data-theme="dark"] .theme-ico .sun{display:block}
+:root[data-theme="dark"] .theme-ico .moon{display:none}
+.side .sub{color:var(--muted);font-size:12.5px;margin-bottom:18px}
+.side ul{list-style:none;margin:0;padding:0}
+.side li a{display:flex;gap:8px;align-items:baseline;padding:6px 10px;border-radius:8px;color:var(--muted);font-size:14px;line-height:1.45}
+.side li a:hover{background:var(--surface-2);color:var(--text);text-decoration:none}
+.side li a.active{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.side li.part{font-size:11.5px;font-weight:800;letter-spacing:.06em;color:var(--accent);padding:16px 10px 4px}
+.side .n{font-variant-numeric:tabular-nums;font-size:12px;min-width:16px;opacity:.8}
+.side .tools{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap}
+button{font:inherit;font-size:13px;color:var(--text);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;cursor:pointer}
+button:hover{background:var(--surface-2)}
+/* main */
+main{padding:40px 48px 120px;min-width:0}
+.hero{padding:8px 0 28px;border-bottom:1px solid var(--line);margin-bottom:36px}
+.eyebrow{color:var(--accent);font-weight:700;font-size:13px;letter-spacing:.04em}
+h1{font-size:34px;line-height:1.3;letter-spacing:-.02em;margin:8px 0 12px}
+.hero p{color:var(--muted);margin:0 0 6px;max-width:760px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;min-width:120px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:20px;font-variant-numeric:tabular-nums}
+.stat span{color:var(--muted);font-size:13px}
+h2{font-size:26px;line-height:1.35;letter-spacing:-.015em;margin:0 0 8px}
+.sec-title{font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.04em;margin:0 0 6px}
+section{margin-bottom:64px}
+/* roadmap */
+.weeks{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin:18px 0 28px}
+.week{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.week .wk{font-size:12px;font-weight:800;color:var(--accent);letter-spacing:.05em}
+.week h3{font-size:17px;margin:4px 0 2px;line-height:1.4}
+.week .nbk{font-size:12.5px;color:var(--muted);margin:0 0 8px}
+.week ul{margin:0 0 10px;padding-left:18px;font-size:14px;line-height:1.6;flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips .lbl{font-size:12.5px;color:var(--muted);margin-right:2px}
+.chip{display:inline-block;font-size:12px;line-height:1;padding:5px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-weight:700;white-space:nowrap;vertical-align:1px}
+.chip:hover{text-decoration:none;filter:brightness(.95)}
+.xref{font-weight:600;white-space:nowrap}
+/* matrix */
+.tbl{overflow-x:auto;margin:14px 0 20px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14.5px;line-height:1.6}
+th,td{border-bottom:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;overflow-wrap:normal}
+.prose .tbl table{min-width:620px}
+.prose .tbl td,.prose .tbl th{min-width:88px}
+thead th{background:var(--surface-2);font-size:13px;color:var(--muted);font-weight:700;white-space:nowrap}
+tbody tr:last-child th,tbody tr:last-child td{border-bottom:0}
+.matrix th,.matrix td{text-align:center;padding:7px 6px}
+.matrix tbody th{text-align:left;white-space:nowrap;font-weight:600;font-size:14px;padding-left:14px}
+.dot{display:inline-block;width:14px;height:14px;border-radius:50%;background:transparent;border:1px dashed var(--line)}
+.dot.d1{background:var(--dot1);border:0}.dot.d2{background:var(--dot2);border:0}.dot.d3{background:var(--dot3);border:0}
+.legend{display:flex;gap:14px;align-items:center;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.legend .dot{vertical-align:-2px;margin-right:4px}
+/* chapter */
+.chapter{padding-top:8px}
+.ch-head{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 24px;margin-bottom:22px;box-shadow:var(--shadow)}
+.ch-no{font-size:12.5px;font-weight:800;color:var(--accent);letter-spacing:.06em}
+.lede{color:var(--muted);margin:2px 0 12px}
+/* floating sub-topic panel (current chapter) */
+.otp-col{display:none}
+.otp{position:sticky;top:24px;max-height:calc(100vh - 48px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 10px 12px;box-shadow:var(--shadow);visibility:hidden;opacity:0;transition:opacity .15s}
+.otp.show{visibility:visible;opacity:1}
+.otp-head{font-size:11.5px;font-weight:800;letter-spacing:.06em;color:var(--accent);padding:0 8px 2px}
+.otp-ch{font-size:14px;font-weight:700;line-height:1.45;padding:0 8px 10px;margin-bottom:6px;border-bottom:1px solid var(--line)}
+.otp ol{list-style:none;margin:0;padding:0;counter-reset:s}
+.otp li a{display:flex;gap:8px;padding:5px 8px;border-radius:8px;font-size:13px;line-height:1.45;color:var(--muted)}
+.otp li a::before{counter-increment:s;content:counter(s);font-variant-numeric:tabular-nums;font-size:11.5px;min-width:16px;opacity:.7;padding-top:1px}
+.otp li a:hover{background:var(--surface-2);color:var(--text);text-decoration:none}
+.otp li a.active{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.otp code{font-size:.92em;background:none;padding:0}
+.otp-btn{display:none}
+@media (min-width:1240px){
+  .layout{grid-template-columns:270px minmax(0,1fr) 260px;max-width:1580px}
+  .otp-col{display:block;padding:28px 20px 28px 0}
+}
+@media (max-width:1239px){
+  .otp-col{display:block;position:fixed;right:16px;bottom:72px;width:min(320px,calc(100vw - 32px));z-index:30}
+  .otp{position:static;max-height:min(70vh,560px);box-shadow:0 8px 30px rgba(0,0,0,.18)}
+  .otp-col:not(.open) .otp{display:none}
+  .otp-btn{position:fixed;right:16px;bottom:16px;z-index:31;border-radius:999px;padding:10px 16px;font-weight:700;background:var(--accent);color:var(--bg);border:0;box-shadow:0 4px 16px rgba(0,0,0,.18)}
+  .otp-btn:hover{background:var(--accent);filter:brightness(1.05)}
+  .otp-btn.show{display:inline-block}
+}
+.prose{max-width:820px}
+.prose h3{font-size:20px;line-height:1.4;margin:40px 0 10px;padding-top:6px;letter-spacing:-.01em}
+.prose h3:first-child{margin-top:8px}
+.prose h4{font-size:16.5px;margin:26px 0 6px}
+.prose p{margin:0 0 12px}
+.prose ul,.prose ol{padding-left:22px;margin:0 0 14px}
+.prose li{margin:3px 0}
+.prose li>ul,.prose li>ol{margin:4px 0}
+.prose strong{font-weight:700}
+.prose code{background:var(--code-bg);padding:1px 5px;border-radius:5px}
+.prose pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto;line-height:1.55;margin:0 0 16px}
+.prose pre code{background:none;padding:0;font-size:13.5px}
+.prose hr{border:0;border-top:1px solid var(--line);margin:28px 0}
+blockquote{margin:0 0 16px;padding:10px 16px;border-left:3px solid var(--line);color:var(--muted)}
+.callout{margin:4px 0 18px;padding:12px 16px 4px;border-radius:12px;border:1px solid transparent}
+.callout p{margin:0 0 8px}
+.callout>p:first-child>strong:first-child{display:inline-block;margin-right:4px}
+.callout.tip{background:var(--tip-bg)}.callout.tip>p:first-child>strong:first-child{color:var(--tip)}
+.callout.warn{background:var(--warn-bg)}.callout.warn>p:first-child>strong:first-child{color:var(--warn)}
+.callout.ex{background:var(--ex-bg)}.callout.ex>p:first-child>strong:first-child{color:var(--ex)}
+.callout.sum{background:var(--sum-bg)}.callout.sum>p:first-child>strong:first-child{color:var(--sum)}
+.callout.qa{background:var(--qa-bg)}.callout.qa>p:first-child>strong:first-child{color:var(--qa)}
+/* lectures */
+.lec{background:var(--surface);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;box-shadow:var(--shadow)}
+.lec summary{cursor:pointer;list-style:none;display:flex;gap:12px;align-items:baseline;padding:14px 18px;flex-wrap:wrap}
+.lec summary::-webkit-details-marker{display:none}
+.lec summary::before{content:"▸";color:var(--muted);transition:transform .15s}
+.lec[open] summary::before{transform:rotate(90deg)}
+.lec .ln{font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}
+.lec .ld{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
+.lec .lt{font-weight:600;flex:1;min-width:200px}
+.lec-body{padding:0 22px 18px;border-top:1px solid var(--line)}
+.lec-body .nbk{color:var(--muted);font-size:13.5px;margin:14px 0 6px}
+.lec-body .one{background:var(--surface-2);border-radius:10px;padding:10px 14px;margin:0 0 8px}
+.lec-body .prose h3{font-size:17px;margin-top:28px}
+.lec-body .prose h4{font-size:15.5px}
+.note{font-size:13.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:18px}
+.menu-btn{display:none}
+@media (max-width: 920px){
+  .layout{display:block}
+  .side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:16px}
+  .side ul{display:none;margin-top:8px}
+  .side.open ul{display:block}
+  .menu-btn{display:inline-block}
+  .side .sub{margin-bottom:8px}
+  main{padding:24px 16px 80px}
+  h1{font-size:26px}
+  h2{font-size:22px}
+  .ch-head{padding:18px 16px}
+  .lec summary{padding:12px 14px}
+  .lec-body{padding:0 14px 14px}
+}
+@media print{.side,.otp-col,.otp-btn{display:none}.layout{display:block}.lec{break-inside:avoid}details.lec>*{display:block}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="side" id="side">
+  <div class="brand-row"><div class="brand">에이전틱 AI 학습 노트</div><button class="theme-ico" id="themeBtn" type="button" aria-label="테마 전환" title="테마 전환"><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button></div>
+  <div class="sub">Ⅲ. GPT와 Transformer</div>
+  <div class="tools">
+    <button class="menu-btn" id="menuBtn" type="button">목차 열기</button>
+
+  </div>
+  <ul id="toc" style="margin-top:14px">
+<li><a href="#overview">한눈에 보기</a></li>
+<li><a href="#ch-1"><span class="n">1</span>LLM과 딥러닝의 기본 원리</a></li>
+<li><a href="#ch-2"><span class="n">2</span>Transformer 블록 해부</a></li>
+<li><a href="#ch-3"><span class="n">3</span>GPT-2에서 현대 LLM으로</a></li>
+<li><a href="#ch-4"><span class="n">4</span>모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</a></li>
+<li class="part">다른 파트</li>
+<li><a href="agentic-ai-1-agent-basics.html"><span class="n">Ⅰ</span>에이전트의 기초</a></li>
+<li><a href="agentic-ai-2-agent-features.html"><span class="n">Ⅱ</span>Kanana 클론 코딩</a></li>
+<li><a href="agentic-ai-4-tools-practice.html"><span class="n">Ⅳ</span>도구와 실무</a></li>
+  </ul>
+</aside>
+<main>
+<header class="hero" id="overview">
+  <div class="eyebrow">카카오테크캠퍼스 1단계 학습 노트 Ⅲ</div><h1>GPT와 Transformer</h1><p>에이전트를 제대로 다루려면 알아 둘 모델 내부 원리를 모았습니다. 문장이 토큰과 임베딩이 되어 어텐션과 MLP를 지나 다음 토큰으로 나오기까지의 흐름, GPT-2 이후 현대 LLM에서 바뀐 구조, 사전학습에서 SFT와 강화학습, 파인튜닝으로 이어지는 학습 과정을 다룹니다.</p>
+</header>
+
+
+
+<section class="chapter" id="ch-1"><header class="ch-head"><div class="ch-no">주제 1</div><h2>LLM과 딥러닝의 기본 원리</h2><p class="lede">LLM은 &quot;조건(프롬프트)에 따라 다음 토큰의 확률 분포를 내놓고 그중 하나를 고르는 모델&quot;이다. 이 출발점과, 그 밑바탕인 딥러닝의 벡터, 공간, 압축 관점을 정리한다. 아이템 박스, 바다 이야기, 784차원 고양이 비유를 한곳에 모았다.</p></header><div class="prose"><h3 id="ch-1-왜-에이전트-과정에서-모델-내부를-보나">왜 에이전트 과정에서 모델 내부를 보나</h3>
+<ul>
+<li>에이전트의 기반과 전체 동작은 결국 트랜스포머의 특성을 따라갈 수밖에 없고, SLM 파인튜닝, 경량화, 증류(distillation)를 하려면 구조를 알아야 한다. 그래서 에이전트를 다루면서도 모델 내부를 조금씩 짚는다.</li>
+<li>설명 방식은 "수식이 아니라 그림으로"다. 계산법보다 "어떤 것 때문에 이렇게 동작하는지"에 초점을 둔다.</li>
+<li>실제 AI 필드에서는 대부분의 연구가 이 구조 안에서 진행된다. 최근 각광받는 증류도 Teacher-Student 모델을 만들어, 한 모델의 어텐션 파트나 데이터 분포 파트를 동작시킨 결과를 다른 모델이 배우는 식이다. → <a class="xref" href="#ch-4">→ 모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</a></li>
+<li>에이전트 쪽은 "질문(컨텍스트)을 어떻게 잘 만드나"를, GPT 구조 쪽은 "주어진 컨텍스트로 답을 얼마나 잘 만드나"를 연구한다. 모델 구조를 배우는 이유는 모델이 <strong>컨텍스트를 얼마나 잘 이해하는지</strong> 알기 위해서다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> 에이전트를 다루는 것은 <strong>운전</strong>이고, 모델을 만드는 것은 <strong>차를 직접 만들거나 튜닝</strong>하는 것이다. 차를 만들고 튜닝할 줄 알면 운전도 더 잘하게 된다. 이런 내용이 에이전트 배경에서 동작하고 있다.</p>
+</aside>
+<ul>
+<li>어디까지 알면 되나: 사용하는 입장에서는 "어텐션에서 특징을 추출하고 MLP에서 패턴을 인식한다" 정도면 된다. 직접 구현, 튜닝, 파인튜닝을 하려면 자세히 알수록 좋다. 예전엔 트랜스포머를 직접 구현해야 한다고 했지만 지금은 구조가 어떻게 동작하는지 정리하는 정도면 충분하고, 코드, 수식으로 이해한 내용의 <strong>전체 흐름</strong>만 잡으면 된다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout sum">
+<p><strong>정리</strong> 이 파트는 모델이 컨텍스트를 어떻게 보는지 이해해 프롬프트, 컨텍스트를 더 잘 설계하기 위한 배경지식이다.</p>
+</aside>
+<h3 id="ch-1-llm과-바닐라-llm-본연의-기능은-텍스트-생성">LLM과 바닐라 LLM: 본연의 기능은 텍스트 생성</h3>
+<ul>
+<li>범위는 딥러닝 → <strong>생성 모델</strong> → 그중 <strong>텍스트 생성(text generation)</strong> 모델 → <strong>GPT 기반 LLM</strong> 순으로 좁혀진다.</li>
+<li>LLM(Large Language Model)은 언어 모델 중 <strong>사이즈가 큰</strong> 모델이고, 지금 텍스트 생성 모델 중 성능이 가장 좋은 모델들이다.</li>
+<li>ChatGPT, Claude Code를 쓸 때 보이는 동작은 두 갈래다. ① 순수하게 텍스트를 생성하는 부분, ② "생각 중", "파일 읽는 중", "검색 중"처럼 기능이 들어간 부분. 둘은 <strong>분리할 수 있다.</strong> LLM 본연의 기능(<strong>바닐라 LLM</strong>)은 ①뿐이고, ②는 모델 바깥에서 툴로 붙인 기능이다. → <a class="xref" href="agentic-ai-1-agent-basics.html#ch-1">→ 에이전트란 무엇인가</a> <a class="xref" href="agentic-ai-1-agent-basics.html#ch-2">→ Tool과 Function Calling</a></li>
+<li>LLM은 원래 사람이 말하거나 글을 쓰듯 문장을 만들도록 학습됐다. 그래서 기본 출력은 자연어이고, 구조화된 출력이 따로 필요해졌다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-1">→ 구조화된 출력과 Pydantic</a></li>
+<li>GPT는 <strong>Generative Pre-trained Transformer</strong>다. 텍스트(단어)가 들어오면 <strong>다음 단어를 예측하는 예측기</strong>이고, 지금 쓰는 모든 LLM과 에이전트가 이 규칙을 따른다. 내부 구조는 <a class="xref" href="#ch-2">→ Transformer 블록 해부</a>.</li>
+</ul>
+<h3 id="ch-1-확률-모델-비유-아이템-박스와-바다-이야기">확률 모델 비유: 아이템 박스와 바다 이야기</h3>
+<p>이 과정 전체에서 여러 번 다시 쓰이는 핵심 비유다.</p>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> <strong>아이템 박스</strong>: 게임 아이템 박스에서 A 70%, B 20%, C 10%가 나온다. 100개를 열면 A 약 70개, B 약 20개, C 약 10개를 기대할 수 있고(정확하진 않을 수 있다), 1000개를 열면 A 약 700개를 기대할 수 있다. 확률만 보고 결과를 직관적으로 예측하는, 가장 익숙한 확률 모델이다.</p>
+</aside>
+<ul>
+<li>그럼 딥러닝 모델은 여기서 뭐가 다를까? 답은 <strong>조건</strong>이다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> <strong>바다 이야기</strong>: 확률 조작으로 뉴스에 나왔던 사행성 게임이다. <strong>사장님이 버튼을 누르면</strong> 확률이 A 80%, B 20%, C 0%로 바뀐다. 사람들은 원래 확률이 바뀌었으니 "확률 조작"이라 부르지만, <strong>딥러닝 모델이 바로 이렇게 동작한다.</strong> "사장님이 버튼을 눌렀을 때"를 "입력이 들어왔을 때"로 바꿔 보면 된다.</p>
+</aside>
+<ul>
+<li>즉 모델이란 "어떤 조건일 때 어떤 확률 분포를 내놓느냐"다.</li>
+<li>딥러닝은 <strong>항상 조건이 있어야 실행</strong>된다. 사람이 들어가면 어떤 결과, 강아지가 들어가면 어떤 결과, 고양이가 들어가면 어떤 결과가 나온다. 프롬프트가 들어가면 결과가 달라지는데, 그 말은 <strong>단어를 예측할 확률 분포가 달라진다</strong>는 뜻이다. 조건이 달라지면 나올 수 있는 단어도 달라진다.</li>
+<li>이 비유로 "프롬프트를 반복하면 왜 강조되는가"도 설명할 수 있다. 어텐션 점수를 직접 조절하지는 못해도 조건은 바꿀 수 있다는 것이다. → <a class="xref" href="#ch-2">→ Transformer 블록 해부</a></li>
+</ul>
+<!-- -->
+
+<aside class="callout sum">
+<p><strong>정리</strong> 아이템 박스는 확률이 고정된 모델이고, 바다 이야기는 <strong>조건(버튼)에 따라 확률이 바뀌는</strong> 모델이다. 딥러닝과 LLM은 후자다.</p>
+</aside>
+<h3 id="ch-1-조건부-확률-pyx-분류-모델에서-생성-모델까지">조건부 확률 P(y|x): 분류 모델에서 생성 모델까지</h3>
+<ul>
+<li>버튼 대신 <strong>고양이 사진</strong>을 넣으면 고양이를 찾을 확률이, <strong>사람 이미지</strong>를 넣으면 그 사람을 찾아낼 확률이 나온다. 입력(조건)에 따라 예측 확률 분포를 다르게 만드는 것이 <strong>분류 모델의 동작 원리</strong>다.</li>
+<li>수식 <strong>P(y|x)</strong>는 x가 들어갔을 때 y의 확률이다. 고양이 사진이 들어갔을 때 y=고양이일 확률, 강아지 사진이 들어갔을 때 y=고양이일 확률이 그 예다. marginal probability 등과 함께 배우는 이 표기 자체가 "조건이 주어졌을 때 모델이 예측하는 확률"이다.</li>
+<li>텍스트로 바꾸면, <strong>"나는 학교에"라는 조건</strong>에서 <strong>"갑니다"를 예측하도록 학습</strong>하면 그걸 정확히 예측하게 된다. 결론: <strong>딥러닝 모델은 항상 조건부로 동작한다.</strong> "이 조건에서는 고양이로 분류한다", "이 조건에서는 '갑니다'를 생성한다". 이 조건부 예측을 <strong>사람 정도로</strong> 잘하는 모델이 지금 쓰는 LLM이다.</li>
+<li>수식으로 다시 쓰면 이렇다. "나는 학교에 갑니다"에서 맞춰야 할 "갑니다"를 y라 하면, x1(나는)과 x2(학교에)가 <strong>주어졌을(given) 때</strong> y가 "갑니다"일 확률을 묻는 문제다.</li>
+</ul>
+<pre><code>P(y = 갑니다 | x1 = 나는, x2 = 학교에)
+</code></pre>
+<ul>
+<li>평가에서 보는 <strong>perplexity</strong>도 같은 이야기다. 단어는 앞 컨텍스트의 영향을 받아 생성되고, perplexity를 계산할 때도 앞 컨텍스트가 그 단어의 예측에 영향을 준다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-6">→ 에이전트 평가와 LLM-as-a-judge</a></li>
+</ul>
+<h3 id="ch-1-프롬프트-조건-나는-학교에-다음-말-고르기">프롬프트 = 조건: "나는 학교에" 다음 말 고르기</h3>
+<ul>
+<li>모델에 넣는 <strong>프롬프트는 "조건"</strong>이다. 조건 "나는 학교에"를 넣으면 모델이 "갑니다"를 생성한다. 질문을 넣으면 답이 생성되는 흐름 전체가 이것이다.</li>
+<li>"나는 학교에" 뒤에 올 후보는 <strong>갑니다 10%, 간다 9%, 가는 중이다 8%</strong>…처럼 각각 확률을 가진다. 모델은 이 분포에서 <strong>하나를 선택</strong>한다. 답을 "만든다"기보다 <strong>고른다</strong>.</li>
+<li>엄밀히는 생성이라기보다 <strong>가장 높은 확률의 단어들이 샘플링</strong>되는 것이다. 무작위 추첨이 아니라 "사람들이 이런 조건에서 어떤 단어를 쓰는지"를 확률적으로 계산해서 고를 수 있게 만든 것이다.</li>
+<li>컨텍스트는 "이 모델의 조건, 입력 조건, 이 모델에 입력되는 프롬프트"를 가리킨다. 시스템 프롬프트, 기본 규칙(rule), 툴 description, 대화가 모두 똑같이 조건으로 들어간다.</li>
+<li>그래서 모델이 아는 것은 <strong>컨텍스트에 있는 것뿐</strong>이다.<ul>
+<li>모델은 코드를 보지 못한다. 실제 코드가 도는 게 아니라 사람이 써 준 설명을 기반으로 모델이 값을 유추한다. 툴의 함수 이름, description, 파라미터 이름, <code>required</code> 같은 설명만 본다.</li>
+<li>온라인 연결이나 다른 정보 없이는 날짜, 최신 데이터를 모른다. "내일"을 "7월 3일"로 바꾸려면 OS 날짜나 검색 결과를 컨텍스트에 넣어 줘야 한다.</li>
+<li>툴이 일정을 메모리에 저장해도 새 대화로 컨텍스트가 사라지면 모델은 그 ID를 모르니 삭제하지 못한다.</li>
+</ul>
+</li>
+<li>정리하면, 프롬프트를 잘 만드는 작업은 이미지 도메인에서 <strong>정확한 정답 세트를 맞춰 학습시키는 것과 같은 역할</strong>을 한다. 툴을 쓰는 것도, 프롬프트, 컨텍스트 엔지니어링도 결국 모델에 들어갈 조건을 얼마나 잘 구성하느냐의 문제다. 예전 딥러닝에서 "데이터를 정제하라, 많이 모으라"고 하던 것과 같은 맥락이다. → <a class="xref" href="agentic-ai-1-agent-basics.html#ch-3">→ 프롬프트 엔지니어링</a> <a class="xref" href="agentic-ai-1-agent-basics.html#ch-4">→ 컨텍스트 엔지니어링과 하네스</a></li>
+</ul>
+<!-- -->
+
+<aside class="callout sum">
+<p><strong>정리</strong> 프롬프트를 쓴다는 것은 다음 토큰의 확률 분포를 원하는 쪽으로 끌고 가는 <strong>조건</strong>을 설계하는 일이다.</p>
+</aside>
+<h3 id="ch-1-자기회귀-생성-한-번에-한-토큰-앞이-뒤를-강제한다">자기회귀 생성: 한 번에 한 토큰, 앞이 뒤를 강제한다</h3>
+<ul>
+<li>앞에 있는 것들을 쭉 보고 <strong>다음 것을 예측</strong>해 생성하는 모델을 <strong>오토리그레시브(자기회귀) 모델</strong>이라 한다. LLM은 조건에 따라 답을 선택하므로 확률적으로 동작한다.</li>
+<li>GPT 모델 자체는 들어온 데이터에 대해 <strong>항상 다음 토큰 하나</strong>를 예측한다. 모델은 토큰을 하나씩밖에 생성하지 못하고, 그 토큰을 생성하기 위해 조건을 계속 추가하는 것이다.</li>
+<li>예를 들어 처음 "나는"이 들어가면 "학교에"를 만든다. "학교에"를 만들 때도 "나는"이 같이 들어가고, "나는 학교에 갑니다"까지 계속 누적된다. 단어 하나를 생성할 때마다 <strong>모든 내용이 다시 모델에 들어가</strong> 다음 단어를 만든다.</li>
+</ul>
+<pre><code>조건: 나는               → 생성: 학교에
+조건: 나는 학교에         → 생성: 갑니다
+조건: 나는 학교에 갑니다   → 생성: (다음 토큰)
+</code></pre>
+<ul>
+<li>그래서 앞에 쌓인 정보가 항상 뒤에 영향을 준다. 프롬프트 계층(LLM 기본 프롬프트 → ReAct 프롬프트 → 시스템 프롬프트 → 유저 프롬프트)은 단어를 하나 생성할 때마다 매번 조건으로 쓰이므로, 시스템 프롬프트에 쓴 대로 모델이 동작한다. → <a class="xref" href="agentic-ai-1-agent-basics.html#ch-3">→ 프롬프트 엔지니어링</a></li>
+<li>퓨샷이 잘 통하는 이유도 이것이다. 예시가 생성 내내 참조되고, 예시대로 만든 출력도 앞부분에 계속 쌓여 같은 패턴이 더 명확해진다.<ul>
+<li>"이 영화는 재미있습니다 → 긍정", "이 영화는 별로입니다 → 부정"을 앞에 두면 "이 영화는 재미없다"에도 "부정"이라는 같은 형식으로 답한다. 예시가 없으면(제로샷) "부정적인 문장입니다"처럼 답은 맞아도 형식이 들쭉날쭉하다.</li>
+<li>컨텍스트가 유독 길던 시절의 Gemini에 퓨샷 예시를 가득 채워 답을 요구했더니 정답률이 올라갔다는 실험도 있다.</li>
+</ul>
+</li>
+<li>에이전트와의 연결: 플래닝이든 툴콜이든 메모리든, 에이전트가 하는 모든 동작은 사실 <strong>이 컨텍스트에 계속 재입력되는 것</strong>이다. 잘못 고른 툴의 결과도 컨텍스트에 들어가 이후 생성 확률에 계속 영향을 준다. → <a class="xref" href="agentic-ai-1-agent-basics.html#ch-2">→ Tool과 Function Calling</a> <a class="xref" href="agentic-ai-1-agent-basics.html#ch-4">→ 컨텍스트 엔지니어링과 하네스</a></li>
+</ul>
+<!-- -->
+
+<aside class="callout sum">
+<p><strong>정리</strong> 앞이 뒤를 강제한다. 좋은 예시와 규칙은 끝까지 좋은 조건이 되고, 잘못 들어간 정보도 끝까지 조건으로 남는다.</p>
+</aside>
+<h3 id="ch-1-기반-모델과-확률적-생성의-한계">기반 모델과 확률적 생성의 한계</h3>
+<ul>
+<li>조건에 텍스트가 들어오면 다음을 예측하는 모델을 <strong>기반 모델(Foundation Model)</strong>이라 부른다. 예: GPT-3.5, GPT-4, GPT-4o(4 옴니).</li>
+<li>"조건에 따라 확률적으로 값을 찾는다"는 성질에서 세 가지 한계가 나온다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>한계</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>환각(hallucination)</td>
+<td>잘못된 정보를 만든다</td>
+</tr>
+<tr>
+<td>통제 어려움</td>
+<td>모델이 어떻게 확률을 맞춰 다음 단어를 고르는지 모르니 "사람이라면 이렇게 말하겠지" 하고 프롬프트를 쓸 수밖에 없다. 그래서 프롬프트 엔지니어링이 나왔다</td>
+</tr>
+<tr>
+<td>성능 부족</td>
+<td>프롬프트를 줘도 원하는 결과가 안 나와 파인튜닝이나 RAG를 붙이게 된다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>이 과정은 모델을 새로 만들기보다 <strong>컨텍스트, 도구로 이를 보완</strong>하는 쪽을 택한다. → <a class="xref" href="agentic-ai-1-agent-basics.html#ch-1">→ 에이전트란 무엇인가</a></li>
+<li>보강하면, LLM과 기존 프로그램의 가장 큰 차이는 <strong>확률적 생성</strong>이다. 가장 큰 이유는 <strong>샘플링</strong>이다. temperature를 0으로 두면 가장 높은 확률의 단어가 나오게 동작하지만, 기본 동작은 후보 중에서 샘플링하는 것이라 출력이 <strong>비결정적</strong>이다. 할루시네이션, 툴 잘못 선택, 이상한 검색, 의도대로 동작하지 않는 문제가 모두 여기서 나온다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> <strong>공 뽑기</strong>: 공 10개 중 X가 표시된 공이 6개, O가 표시된 공이 4개다. 샘플링은 여기서 공을 뽑는 과정과 비슷하다. 가장 적합한 단어가 나올 확률이 높긴 하지만 항상 같은 결과가 나오지는 않는다.</p>
+</aside>
+<ul>
+<li>그래서 "이 모델은 100%가 없다." 모델 성능이 아무리 좋아져도 이 <strong>구조적 한계</strong> 때문에 출력이 잘못 나올 수 있다. 비결정성이 기본값이므로 우리가 하는 일은 가이드라인으로 변동성을 줄이는 것이다. 다만 아무렇게나 나오는 게 아니라 <strong>조건(컨텍스트)</strong>을 따라 확률이 정해지므로, 조건을 바꿔 확률을 원하는 쪽으로 끌고 갈 수 있다. temperature와 샘플링의 내부 동작은 <a class="xref" href="#ch-2">→ Transformer 블록 해부</a>.</li>
+</ul>
+<h3 id="ch-1-학습-데이터-분포와-소수-조건-llm과-slm">학습 데이터 분포와 소수 조건, LLM과 SLM</h3>
+<ul>
+<li>모델은 조건을 학습할 때 <strong>데이터가 많은 쪽 위주</strong>로 배운다. 한국어, 특수 기술, 일상 대화가 아닌 전공 분야 같은 <strong>소수 조건</strong>은 데이터가 많지 않다. 이런 것이 조건으로 들어가면 단어를 샘플링하는 확률이 크게 흔들릴 수 있다.</li>
+<li>사례: <strong>사투리</strong>로 실험했더니 인식이 잘 안 됐다. 사투리 데이터셋 자체가 소수이기 때문이다. 보완책은 RAG 등으로 정보 증강, 사투리를 번역, 변환하는 규칙, 사투리가 어떻게 동작하는지 정보 넣기, 툴 내부의 금지 단어 필터링이다.</li>
+<li>LLM은 프롬프팅을 잘 인식하지만 SLM 단위로만 내려가도 답을 잘 못한다. 그래서 SLM(Ollama Cloud 등)으로 연습하면 프롬프트 쓰는 연습이 많이 된다. few-shot, CoT의 큰 구조는 유지하되 더 자세히 쓰고 예시를 더 만들어야 한다. → <a class="xref" href="agentic-ai-4-tools-practice.html#ch-1">→ 모델 고르기와 여러 모델 조합</a></li>
+</ul>
+<h3 id="ch-1-쿼리형-모델에서-챗봇형-모델로">쿼리형 모델에서 챗봇형 모델로</h3>
+<ul>
+<li>프롬프트 엔지니어링은 지금 같은 채팅 모델 이전, "언어 모델", "텍스트 제너레이션 모델"이라 부르던 GPT-2 같은 모델 때부터 쓰던 방식이다. ChatGPT 이전 역사를 모르면 지금의 챗봇 상태만 기준으로 프롬프트 엔지니어링을 이해하게 된다.</li>
+<li>두 방식을 구분하면 다음과 같다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>구분</th>
+<th>동작</th>
+<th>그 시절의 프롬프트</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>쿼리형</td>
+<td>쿼리가 들어가면 답이 나오고 끝나는 단발 구조. "한 번 질문하면 그에 대해 답하는 것"으로 성능을 평가했다</td>
+<td>그것만 입력해 답을 얻어야 하니 "너는 개발자고 파이썬 개발자고…", "가족을 위해 코딩을 한다, 철저히 ~해야 된다"처럼 처음부터 빽빽하게 썼다</td>
+</tr>
+<tr>
+<td>챗봇형</td>
+<td>질의응답의 답이 다시 입력으로 들어가 다음 답이 나오는 구조. 지금 모델은 내부도 챗봇 기반이다</td>
+<td>간단히 넣고 돌려 보며 프롬프트를 증강한다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>결론은 비슷하지만 순서가 바뀐 것이다. 여기서는 학습 기법(지시 튜닝, RLHF 등)을 구체적으로 다루지 않고 동작, 평가 방식의 차이로만 설명했다. GPT가 원래 채팅 모델이 아니라 커스텀 토큰으로 대화 형식을 학습했다는 설명은 <a class="xref" href="#ch-4">→ 모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</a>.</li>
+</ul>
+<h3 id="ch-1-제로샷-퓨샷의-원래-의미">제로샷, 퓨샷의 원래 의미</h3>
+<ul>
+<li>원래 딥러닝 용어다.<ul>
+<li><strong>제로샷 러닝</strong>: 이미 학습된 모델이 <strong>추가 학습 없이</strong> 정보를 찾아내거나 분류, 생성하는 것.</li>
+<li><strong>퓨샷 러닝</strong>: <strong>적은 데이터로 약간의 파인튜닝</strong>을 해서 분류, 생성, 탐지(detection)를 하는 것.</li>
+</ul>
+</li>
+<li>음악 추천 예: 음악 추천 모델을 하나 만들어 두고, 제로샷은 음악을 넣으면 바로 추천하고 퓨샷은 특정 장르로 "학습을 조금만 해서" 빠르게 찾아낸다.</li>
+<li>이 용어가 프롬프트로 넘어오면서 <strong>학습이 아니라 예시를 프롬프트에 넣느냐 마느냐</strong>의 의미로 바뀌었다. 프롬프트 기법으로서의 쓰임은 <a class="xref" href="agentic-ai-1-agent-basics.html#ch-3">→ 프롬프트 엔지니어링</a>.</li>
+</ul>
+<h3 id="ch-1-자연어로-생성을-제어하게-된-역사-gan-clip-지금">자연어로 생성을 제어하게 된 역사: GAN → CLIP → 지금</h3>
+<ul>
+<li>프롬프트 엔지니어링은 "튜닝을 <strong>자연어로</strong> 하는 것"이다. 생성을 자연어로 제어하게 된 지는 얼마 되지 않았다.</li>
+<li><strong>GAN</strong>을 다룰 때도 자연어로 생성을 컨트롤하는 방법론은 연구됐지만 실제로 잘 생성하기는 어려웠다. 2020년쯤 <strong>CLIP</strong> 모델을 기반으로 이 흐름이 시작됐다. 지금은 텍스트가 벡터화도 잘 되고 의미를 유지하면서 생성하는 것도 되니 "너무 잘 된다". 아직 초기 단계인데도 잘 돌아가니 <strong>굉장히 진보된 방식</strong>이다.</li>
+<li>그래서 이 원리 위에서 <strong>조건을 자연어로 쓰는 연습</strong>이 에이전트를 잘 만드는 방법 중 하나다.</li>
+</ul>
+<h3 id="ch-1-딥러닝이란-고차원-데이터를-저차원으로-정리해-해석하는-작업">딥러닝이란: 고차원 데이터를 저차원으로 정리해 해석하는 작업</h3>
+<ul>
+<li>"딥러닝이 뭘까?"라는 질문에는 인공신경망, 머신러닝, 퍼셉트론을 여러 층 쌓은 것, 멀티레이어 퍼셉트론(MLP), 뇌를 모방한 것이라는 답이 나온다. 뉴럴 네트워크 이전에 퍼셉트론이 있었고, 퍼셉트론은 사람의 뉴런을 모방해 <strong>가중치 연산</strong>을 하게 만든 것이다. 여러 레이어를 쌓은 것을 딥러닝이라고 부르는 것도 맞다.</li>
+<li>한 줄로 정의하면 딥러닝은 <strong>"고차원의 데이터를 저차원으로 정리해서 해석하는 작업"</strong>이다.</li>
+<li>생성 모델을 다루지 않으면 깊게 볼 파트는 아니다. 하지만 이 과정은 트랜스포머 기반 생성 모델인 GPT를 다루므로 임베딩과 함께 짚는다.</li>
+</ul>
+<h3 id="ch-1-입력은-벡터-mnist-784-128-16-10">입력은 벡터: MNIST 784 → 128 → 16 → 10</h3>
+<ul>
+<li>"딥러닝 모델의 입력은 어떤 형태인가?"의 답은 <strong>벡터(텐서)</strong>다.</li>
+<li>MNIST 예:<ul>
+<li>흑백 1채널 <strong>28×28</strong> 이미지를 reshape, 평탄화(flatten), 정규화해 1차원 벡터로 만든다. DNN의 입력이 1차원 벡터라서 기계적으로 하는 작업이다.</li>
+<li>flatten하면 <strong>784개</strong>가 되고, 레이어를 통과하며 <strong>128 → 16 → 10</strong>이 된다. 마지막 10개로 0~9 중 어떤 숫자인지 찾고, loss를 계산해 학습한다.</li>
+</ul>
+</li>
+</ul>
+<pre><code>28×28 이미지 → flatten → 784 → 128 → 16 → 10 (숫자 0~9)
+</code></pre>
+<ul>
+<li>정리하면, 입력은 벡터이고 레이어를 지날 때마다 가중치 연산으로 벡터(차원)를 줄여 최종 결과를 분석하거나 만든다. 이것이 딥러닝 동작의 전체 과정이며 <strong>GPT도 이와 비슷하게 동작한다.</strong></li>
+<li>이미지는 픽셀, 오디오는 샘플이 그대로 벡터가 될 수 있다. 하지만 텍스트처럼 그런 수치 형태가 없는 raw 데이터는 <strong>변환(임베딩)</strong>이 필요하다. → <a class="xref" href="#ch-2">→ Transformer 블록 해부</a></li>
+</ul>
+<h3 id="ch-1-공간-비유-고양이-사진-한-장-784차원-공간의-점">공간 비유: 고양이 사진 한 장 = 784차원 공간의 점</h3>
+<ul>
+<li>DNN에 고양이 사진을 넣는다고 하자. 픽셀을 쭉 나열하면 흑백 28×28 기준 784개의 데이터가 생긴다.</li>
+<li><strong>독립 가정</strong>: 앞 픽셀이 흰색이라고 옆 픽셀도 흰색이어야 할까? 아니다. 옆은 검은색이든 흰색이든 될 수 있다. 그래서 벡터의 각 값이 서로 독립이라고 가정할 수 있다.</li>
+<li>같은 점이라도 (1, 1)은 2차원이고 (1, 1, 0)은 3차원이다. <strong>차원 = 데이터가 나타낼 수 있는 (서로 독립인) 특징의 개수</strong>이고, 그래서 공간으로 표현할 수 있다. 핵심은 각 축이 독립이라는 점이다.</li>
+<li>784개 픽셀에 독립 가정을 주면 고양이 이미지는 <strong>784차원 공간의 점 하나</strong>가 된다. 이미지로 봐도 고양이, 픽셀을 뽑아 만든 벡터도 고양이다. "이 공간 자체가 이 데이터와 같은 것"이고, 픽셀이 축에 찍힌 형태라 점으로 보일 뿐이다. 이 고양이도, 저 고양이도 그 공간의 점이다.</li>
+<li>flatten이 사실 이것을 의미한다. 독립이 아니라면 그림을 못 그릴 뿐, 특징을 가진 데이터의 분포가 있다는 것은 예상할 수 있다.</li>
+<li>보강하면, 축으로 그리려면 축이 서로 <strong>수직(독립)</strong>이어야 하지만, 실제 특징들은 서로 의존적이다(색이 좋으면 맛도 좋다 등). 축 그림은 독립을 <strong>가정, 주장</strong>한 것이다. 생성 모델을 공부하면 축 없이 <strong>실제 데이터 분포</strong>만 그리고, 모델로 그 분포를 <strong>근사(approximation)</strong>한다.</li>
+</ul>
+<h3 id="ch-1-매니폴드와-사다리꼴-차원을-줄이며-공간을-다시-그린다">매니폴드와 사다리꼴: 차원을 줄이며 공간을 다시 그린다</h3>
+<ul>
+<li>784차원은 너무 고차원이라 <strong>해석이 안 된다.</strong> 찍은 점이 고양이라 해도 바로 옆 점이 고양이라고 말할 수 없다. 이 공간에 대한 정보를 모르기 때문이다. 그래서 통계적 기법, 머신러닝, 딥러닝으로 이 공간을 해석하려는 시도가 이어졌다.</li>
+<li>실제로 찍어 보면 고차원 데이터가 특정한 <strong>저차원 모양</strong>으로 배치되어 있다. 이것을 <strong>매니폴드(manifold)</strong>라고 기억하면 된다.</li>
+<li>잘 학습된 모델에 통과시키면 784 → 128 → 16 → <strong>2차원</strong>으로 줄고, 마지막에 찍힌 지점을 보고 "고양이다"라고 판단한다. 레이어는 특징을 합친다 → 다른 공간으로 매핑한다 → 다시 합친다 → 다른 차원으로 매핑한다. 고차원의 한 점이 중간 차원에서는 여기, 다음에는 저기에 찍히다 최종단까지 간다. 이 과정을 딥러닝 모델로 <strong>근사</strong>한다.</li>
+<li>비슷한 고양이 사진이 여러 장 있고 모델이 특징을 잘 추출하도록 학습됐다면, 압축된 공간에서 <strong>고양이 점들은 한곳에, 강아지 점들은 다른 곳에 몰린다.</strong></li>
+<li>모델을 <strong>사다리꼴</strong>로 그리는 이유는 높은 차원을 낮은 차원으로 만들기 때문이다. 이 공간에 찍힌 벡터로 하는 일은 세 가지다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>작업</th>
+<th>공간에서 하는 일</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>분류</td>
+<td>분류선, 즉 결정 경계(decision boundary)를 그어 나눈다</td>
+</tr>
+<tr>
+<td>예측</td>
+<td>같은 공간에서 예측한다</td>
+</tr>
+<tr>
+<td>생성</td>
+<td>뽑아낸 것을 다시 원래 크기로 되돌린다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>고차원 벡터로 작업하는 이유는 데이터 특징을 표현한 차원을 특징 기준으로 압축해, 원하는 결과를 뽑고 데이터를 해석할 수 있게 만들기 위해서다. 응용으로, 추천 모델이 두 데이터를 벡터로 만들면 같은 공간에 있으므로 <strong>거리를 재면 유사도</strong>를 알 수 있다. 임베딩 공간과 유사도는 <a class="xref" href="#ch-2">→ Transformer 블록 해부</a>, 벡터 검색은 <a class="xref" href="agentic-ai-2-agent-features.html#ch-3">→ RAG: 임베딩 검색과 ChromaDB</a>.</li>
+<li>모델을 이렇게 공간과 엮어 이해해 두면 나중에 데이터와 모델을 분석할 때 훨씬 쉽다. 코드뿐 아니라 <strong>공간, 그림으로 이해</strong>하는 것이 좋다.</li>
+</ul>
+<h3 id="ch-1-특징-추출-패턴-인식-옛-딥러닝과-트랜스포머의-공통-구조">특징 추출 → 패턴 인식: 옛 딥러닝과 트랜스포머의 공통 구조</h3>
+<ul>
+<li>여기까지가 <strong>전통적인 딥러닝 접근</strong>이고, <strong>트랜스포머부터는 특징을 뽑아내는 방법이 조금 바뀐다.</strong></li>
+<li>CNN 구조 그림(얼룩말 이미지 분류)과 트랜스포머 구조를 나란히 놓고 보면 똑같진 않지만 <strong>앞에서 패턴(특징)을 인식하고 뒤에서 분류하는 구조</strong>라는 공통점이 있다.<ul>
+<li><strong>CNN = 특징 추출(feature extraction)</strong>: 이미지에서 중요한 데이터를 뽑아 flatten하면 그게 이미지의 특징이다. 고양이 픽셀을 바로 DNN에 넣을 수도 있지만, CNN으로 특징을 먼저 뽑고 DNN에 넣는 게 낫다.</li>
+<li><strong>DNN</strong>: 레이어를 넘어가며 16 → 8처럼 차원이 낮아져 원하는 2차원 공간으로 정리된다. 노드를 축이라 생각하면, "이런 특징을 가진 녀석들은 평균적으로 이 영역에 넣으면 되더라"를 학습해 "이 특징들을 합치면 얼룩말 확률이 높다"는 식으로 분류한다.</li>
+</ul>
+</li>
+<li>트랜스포머도 마찬가지다. <strong>어텐션이 특징을 추출</strong>하고 <strong>MLP가 패턴을 찾는다.</strong> CNN이 이미지의, RNN이 텍스트의 특징을 뽑았듯 그 역할을 어텐션이 한다.</li>
+<li>트랜스포머, 어텐션은 신기술이라 낯설지만, CNN 같은 옛 딥러닝 모델도 모두 <strong>특징 추출 → 패턴 인식 → 분류</strong> 구조였다. 이것을 <strong>크게 키웠더니</strong> 매우 잘 동작해서 LLM이 됐다. 성능이 낮으면 문장다운 문장도 만들기 어렵고, 성능이 올라가면 사람들이 쓰는 단어 패턴을 그대로 생성해 낸다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>모델</th>
+<th>특징 추출</th>
+<th>패턴 인식, 판단</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>이미지 분류 모델</td>
+<td>CNN</td>
+<td>DNN(MLP)</td>
+</tr>
+<tr>
+<td>GPT(트랜스포머 디코더)</td>
+<td>어텐션</td>
+<td>MLP</td>
+</tr>
+</tbody>
+</table></div>
+<!-- -->
+
+<aside class="callout sum">
+<p><strong>정리</strong> 이름은 새롭지만 원리는 옛 딥러닝과 같다. 어텐션과 MLP가 실제로 무엇을 하는지는 <a class="xref" href="#ch-2">→ Transformer 블록 해부</a>에서 본다.</p>
+</aside>
+<h3 id="ch-1-손실-함수-오차로-보기와-분포-추정으로-보기">손실 함수: 오차로 보기와 분포 추정으로 보기</h3>
+<ul>
+<li>딥러닝 입문에서는 텍스트 생성, 분류 모델이 <strong>softmax</strong>와 <strong>cross-entropy loss</strong>로 예측과 정답을 비교해 <strong>확률을 도출</strong>한다고 배운다. 왜 그렇게 도출하는지는 아이템 박스, 바다 이야기 비유로 설명할 수 있다. 즉 softmax, cross-entropy가 하는 일이 "조건에 따른 확률"을 구하는 것이다.</li>
+<li>손실 함수는 두 관점으로 볼 수 있다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>관점</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>오차 계산</td>
+<td>결과가 정답과 얼마나 다른지 계산한다. 분류, 예측 모델은 이것만으로도 설명된다</td>
+</tr>
+<tr>
+<td>분포 추정</td>
+<td><strong>최대우도추정(Maximum Likelihood Estimation, MLE)</strong>으로 데이터의 분포를 추정하는 과정으로 본다. 확률 개념이 들어가 난이도가 있다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>정답과 오차만 봐도 손실 함수가 설명되니 입문 초반에는 분포 관점을 건너뛰는 경우가 많다. 하지만 <strong>생성 모델이나 추천</strong>으로 넘어가면 데이터를 통계적으로 해석하고 특징으로 나누는 관점이 필요해진다. 데이터를 벡터로 바꿔 해석한다는 개념이 생성 모델에서 가장 먼저 나오는 이유이기도 하다.</li>
+<li>정답 토큰에 대한 cross-entropy를 최소화하는 것은 정답 토큰의 확률, 즉 우도를 최대화하는 것과 같다. 두 관점은 같은 계산을 다르게 본 것이다.</li>
+</ul></div></section>
+<section class="chapter" id="ch-2"><header class="ch-head"><div class="ch-no">주제 2</div><h2>Transformer 블록 해부</h2><p class="lede">Transformer Explainer(GPT-2 small 시각화 도구)를 따라, 데이터가 모델 안에서 흐르는 순서대로 정리한다. 토큰화 → 임베딩 → 위치 정보 → 어텐션 → MLP → 블록 반복 → 로짓, softmax → 샘플링 → 자기회귀 생성, 그리고 컨텍스트 길이까지 다룬다.</p></header><div class="prose"><h3 id="ch-2-gpt-트랜스포머-디코더로-만든-생성-모델">GPT = 트랜스포머 디코더로 만든 생성 모델</h3>
+<ul>
+<li>GPT(Generative Pre-trained Transformer)는 트랜스포머의 <strong>디코더만 떼어 와서</strong> 텍스트를 생성시키는 모델이다. 텍스트가 들어오면 <strong>다음 단어를 예측하는 예측기</strong>이고, 지금 쓰는 모든 LLM이 GPT를 기반으로 만들어졌다.</li>
+<li>내부 구조는 웹 시각화 도구 <strong>Transformer Explainer</strong>로 보면 임베딩, 어텐션, MLP 영역의 역할을 하나씩 짚을 수 있다. 계산법이 아니라 "어떤 것 때문에 이렇게 동작하는지"가 초점이다. 시각화가 잘 되어 있고 논문도 있어 미리 읽어 볼 만하다.</li>
+<li>Explainer 속 모델은 <strong>GPT-2 small</strong>이다. 근거는 블록 레이어(어텐션 + MLP)가 <strong>총 12개</strong>이고, 토큰화하면 <strong>단어 위주로</strong> 잘린다는 점이다.</li>
+<li>예시 입력은 <strong>"Data visualization empowers users to"</strong>이며, 그 다음 토큰을 예측하는 과정을 따라간다. 사양 때문에 최대 12개 단어까지만 들어간다.</li>
+<li>GPT-2는 얼마 전까지 최신 모델이었지만 지금은 구조가 조금씩 바뀌는 중이다. 이 장은 GPT-2 small을 기준으로 보고, 현대 모델에서 바뀐 부분은 <a class="xref" href="#ch-3">→ GPT-2에서 현대 LLM으로</a>에서 정리한다.</li>
+</ul>
+<h3 id="ch-2-gpt-2-small-한-바퀴-요약표">GPT-2 small 한 바퀴: 요약표</h3>
+<p>토큰 n개가 들어와 다음 토큰 하나를 예측하기까지의 길이다. 아래 소주제들이 표의 각 행을 차례로 풀어 쓴 것이다.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>입력 → 출력 모양</th>
+<th>하는 일</th>
+<th>비유, 예시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 토큰화</td>
+<td>문장 → 토큰 n개</td>
+<td>Vocab에 있는 조각으로 자른다</td>
+<td>Data / visual / ization / em / power(s) / users / to</td>
+</tr>
+<tr>
+<td>② 토큰 ID</td>
+<td>토큰 n개 → 정수 n개</td>
+<td>Vocab에서 번호를 찾는다</td>
+<td>"번호표 받기. 너는 236번"</td>
+</tr>
+<tr>
+<td>③ 임베딩</td>
+<td>정수 n개 → n×768</td>
+<td>ID에 연결된 768차원 벡터를 꺼낸다</td>
+<td>바코드처럼 보이지만 벡터 / 사과의 특징</td>
+</tr>
+<tr>
+<td>④ 위치 정보</td>
+<td>n×768 → n×768</td>
+<td>위치를 나타내는 값을 더한다</td>
+<td>"그냥 위치값이 더해지는 것"</td>
+</tr>
+<tr>
+<td>⑤ LayerNorm</td>
+<td>n×768 → n×768</td>
+<td>값의 크기를 맞춘다</td>
+<td>시끄러운 단어들의 데시벨 맞추기</td>
+</tr>
+<tr>
+<td>⑥ 마스크드 셀프 어텐션 (헤드 12개)</td>
+<td>n×768 → 점수 n×n → n×768</td>
+<td>앞 단어들과의 연관도를 계산해 Value에 곱한다</td>
+<td>중요한 건 큰 글씨로, 아닌 건 작은 글씨로</td>
+</tr>
+<tr>
+<td>⑦ MLP</td>
+<td>n×768 → n×3072 → n×768</td>
+<td>특징을 보고 단어 패턴을 찾는다</td>
+<td>패턴을 넓게 펼쳐 놓고 압축하며 정제</td>
+</tr>
+<tr>
+<td>⑧ 블록 반복</td>
+<td>⑤~⑦(+residual)을 12번</td>
+<td>768이 들어가 768이 나오니 계속 쌓는다</td>
+<td>통과할수록 강조가 누적된다</td>
+</tr>
+<tr>
+<td>⑨ 로짓</td>
+<td>마지막 위치 벡터 → Vocab 크기의 점수</td>
+<td>LM head를 거쳐 다음 토큰 후보마다 점수를 낸다</td>
+<td>모델이 예측한 연속값</td>
+</tr>
+<tr>
+<td>⑩ temperature, softmax</td>
+<td>로짓 → 확률</td>
+<td>로짓을 T로 나눈 뒤 확률로 바꾼다</td>
+<td>추우면 딱딱, 뜨거우면 다양</td>
+</tr>
+<tr>
+<td>⑪ 샘플링</td>
+<td>확률 → 토큰 1개</td>
+<td>분포에서 하나를 뽑는다(top-k, top-p)</td>
+<td>공 뽑기</td>
+</tr>
+<tr>
+<td>⑫ 자기회귀</td>
+<td>새 토큰을 입력 끝에 붙여 다시 ①</td>
+<td>EOS가 나올 때까지 반복</td>
+<td>"나는" → "학교에" → "갑니다"</td>
+</tr>
+</tbody>
+</table></div>
+<p>참고로 실제 GPT-2에는 마지막 블록 뒤에 LayerNorm이 한 번 더 있고, ⑨의 출력 크기는 GPT-2 Vocab 크기인 50,257이다.</p>
+<h3 id="ch-2-토큰-모델이-인식하는-최소-단위">토큰: 모델이 인식하는 최소 단위</h3>
+<ul>
+<li><strong>토큰 = 모델이 인식하고 생성하는 최소 단위</strong>다. 모델은 토큰 하나를 한 단위로 다룬다.</li>
+<li>웹의 GPT 토크나이저 시각화 사이트에서 모델을 GPT-5로 고르고 "안녕하세요" 등을 넣으면 토큰이 나뉘고, 토큰마다 서로 다른 <strong>토큰 인덱스</strong>가 표시된다. 이 인덱스가 실제로는 벡터로 바뀌어 입력된다.</li>
+<li>Explainer(GPT-2)에서는 "Data visualization empowers users to"가 Data / visual / ization / em / power(s) / users / to처럼 <strong>서브워드 토큰</strong>으로 잘린 상태에서 다음 토큰을 예측한다.</li>
+<li>토크나이징 단위와 모델 성능에 대한 설명:<ul>
+<li>GPT-2처럼 성능이 낮은 모델일수록 토큰을 <strong>길게(단어 단위로)</strong> 자른다. 관리할 단어는 많아지지만 문장 생성 자체는 쉬워진다.</li>
+<li>GPT-4~5 계열처럼 성능이 좋을수록 토큰을 <strong>더 잘게</strong> 자른다. 긴 단어는 접두사, 접미사 단위로 잘린다. 적은 조각을 조합해 문장을 만들어야 하니 더 어렵다. 그래도 지금 모델들은 처음 보는 듯한 단어도 유추해 맞춘다.</li>
+</ul>
+</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>단위</th>
+<th>한국어 "안녕하세요"</th>
+<th>영어</th>
+<th>특징</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>단어 단위</td>
+<td>"안녕", "하세요"를 따로 관리. "안녕"과 "안경"은 다른 단어로 각각 저장한다</td>
+<td>"data", "power"를 다 관리해야 해서 관리할 단위(임베딩)가 매우 많다</td>
+<td>문장 생성은 쉽다</td>
+</tr>
+<tr>
+<td>음절, 글자 단위</td>
+<td>"안", "녕", "경"을 두고 조합해 "안녕"도 "안경"도, "경"으로 "경찰"도 만든다</td>
+<td>알파벳 A~Z 26개만 관리하면 되니 Vocab이 줄어든다</td>
+<td>성능이 낮으면 잘 동작하지 않는다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>RNN 모델은 알파벳 단위에 가까워질수록 문장을 못 만든다. 직접 실험해 봐도 좋다. 한국어 토크나이저를 비교한 사례("45개 → 27개")처럼 토크나이저에 따라 같은 문장의 토큰 수도 크게 달라진다.</li>
+<li>일반적으로는 실제 GPT 계열은 BPE 기반 서브워드 토크나이저를 쓴다. "토큰이 짧다"는 말은 토큰 하나가 짧은 조각 단위라는 뜻으로 이해하면 된다.</li>
+<li>토큰은 길이와 비용의 단위이기도 하다. 생성 파라미터 <code>max_tokens</code>는 답변을 얼마나 길게 만들지 정한다.</li>
+</ul>
+<h3 id="ch-2-vocab과-토큰-id-번호표-받기">Vocab과 토큰 ID: "번호표 받기"</h3>
+<ul>
+<li>자연어 데이터를 처리할 때 가장 먼저 쓰는 것이 <strong>Vocab(어휘집)</strong>과 <strong>Vocab size</strong>다. 지금은 토크나이저, 전처리기(preprocessor)가 자동으로 처리해 직접 만들 일이 많지 않고, 직접 다뤄야 할 때는 <strong>파인튜닝</strong>할 때다.</li>
+<li>예: "data"는 ID 6601 부근, "visualization"은 <strong>32704</strong>였다. Vocab은 모델이 이 프로젝트에서 다룰 수 있는 데이터를 정리해 둔 것이고, ID는 규칙에 따라 만들어진다. 다른 예로 "학교"는 655번, "휴가"는 1번, "규정"은 2번을 들 수 있다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> "data", "to" 같은 자연어가 먼저 인덱스 번호(토큰 ID)로 바뀌는 것은 <strong>번호표를 받는 것</strong>이다. "너는 236번." 그 번호에 해당하는 임베딩 값으로 변환된다.</p>
+</aside>
+<ul>
+<li><strong>Vocab = 모델이 보는 세계 전체</strong>다. 토크나이저가 참조하는 Vocab에 없는 단어는 <strong>인식하지도, 만들어 내지도 못한다.</strong> GPT-2 때는 Vocab에 단어가 아주 많았다.</li>
+<li>Vocab은 처음에 가진 데이터셋을 띄어쓰기나 단어 기준으로 잘라 <strong>집합(set)</strong>으로 만들어 추출한다. 중복 없이 모든 단어가 한 번씩 들어간 원본 상태다. 여기에 <strong>커스텀 토큰</strong>을 추가하는 것이 파인튜닝에서 가장 중요한 작업이다. → <a class="xref" href="#ch-4">→ 모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</a></li>
+<li>ChatGPT처럼 <strong>10만 개가 넘는 토큰</strong>을 가진 모델도 있다(아래 샘플링에서 이것이 문제가 된다). GPT-2 small의 Vocab 크기는 50,257이다.</li>
+</ul>
+<h3 id="ch-2-임베딩-레이어-토큰-id-같은-크기의-벡터">임베딩 레이어: 토큰 ID → 같은 크기의 벡터</h3>
+<ul>
+<li>왜 텍스트에만 임베딩이 필요한가: 고양이 이미지는 픽셀 값이 실제 데이터라 바로 벡터로 만들어 넘길 수 있다. <strong>텍스트는 벡터화가 매우 어려워서</strong> 단어를 인덱스에 연결해 벡터화한다.</li>
+<li>흐름은 단어 → <strong>토큰 번호</strong> → <strong>임베딩 레이어</strong> → 벡터다. ID는 <strong>임베딩이라고 부르는 가중치</strong>와 연결된다. data는 6601번째 벡터, visualization은 32,704번째 벡터와 연결되는 식이다.</li>
+<li>임베딩은 모든 토큰을 <strong>같은 크기의 벡터</strong>로 만든다. 이 크기가 <strong>임베딩 차원(embedding dimension)</strong>이다.<ul>
+<li>Explainer(GPT-2 small)에서는 <strong>768</strong>이다. "Data" 토큰이 768개 값의 벡터가 되고, 그 점이 있는 공간은 768개의 독립 축, 즉 <strong>768차원</strong> 공간이다.</li>
+<li>예를 들어 ChatGPT의 경우 3,072개라면, data, visualization 같은 토큰이 모두 3,072차원 공간에 들어가 있는 셈이다. 임베딩은 이 <strong>공간을 만드는 작업</strong>이다.</li>
+<li>OpenAI 임베딩은 <strong>1,536 / 3,072</strong>차원이다. 그냥 나온 숫자가 아니라, 1,536의 반인 <strong>768</strong>이 Transformer, GPT 초반에 쓰던 임베딩 크기였고 그게 커진 것이다. 일반적으로는 원 논문 Transformer base는 512이고, BERT-base, GPT-1, GPT-2 small이 768이다. 1,536/3,072는 각각 text-embedding-3-small/large의 기본 차원이다.</li>
+</ul>
+</li>
+<li>Explainer의 임베딩은 <strong>바코드처럼</strong> 보이지만 실제로는 벡터다.</li>
+<li>임베딩 레이어도 "모델"이다. GPT를 학습할 때 <strong>역전파가 임베딩까지 내려오므로</strong> 학습한 내용이 임베딩 가중치에 다 반영된다. RAG는 LLM을 만들며 학습한 임베딩 모델을 가져다 쓰자는 발상에서 나왔다고 볼 수 있다. 일반적으로는 OpenAI의 <code>text-embedding-3</code> 계열은 API로 따로 제공되는 임베딩 전용 모델이며, "LLM 학습으로 다듬어진 임베딩"이라는 직관으로 읽으면 된다.</li>
+<li>임베딩 레이어가 학습을 통해 잘 학습돼야 단어의 특징을 잘 뽑고, 그래야 어텐션을 잘 적용하고, 그다음 MLP에서 패턴 인식을 잘한다. 가장 기본이다.</li>
+</ul>
+<h4 id="ch-2-word2vec에서-임베딩-레이어로">Word2Vec에서 임베딩 레이어로</h4>
+<ul>
+<li>Word2Vec은 단어를 <strong>원-핫 벡터</strong>(data = [1, 0, 0], visual = [0, 1, 0])로 만들고, 작은 MLP 수준의 가중치 레이어와 <strong>행렬곱</strong>해 벡터를 뽑아 학습한다. 당시 방식이 CBOW, Skip-gram이고, 딥러닝이라기보다 머신러닝 쪽 모델에 가깝다.</li>
+<li>단점: 단어가 많아지면 원-핫 길이가 계속 늘어난다. <strong>100만 개 단어</strong>라면 단어 하나를 벡터화할 때마다 가중치 레이어와 <strong>100만×100만</strong> 규모의 행렬곱을 해야 한다.</li>
+<li>개선: 단어를 <strong>인덱스로 매칭해 임베딩 레이어에 바로 연결</strong>하는 방식이 현대 NLP 모델의 동작 방식이다. 즉 임베딩 레이어는 Word2Vec이 조금 발전한 방향이다.</li>
+<li>옛 기법도 공부할 이유: 어텐션 계산은 초반 탐색이 매우 느려서, Skip-gram 모델을 어텐션에 붙여 속도를 높이는 연구가 진행 중이다. 기존 모델 동작을 알아야 나중에 모델, 레이어 튜닝에 접목할 수 있다.</li>
+</ul>
+<h3 id="ch-2-임베딩-차원-특징-사과-비유와-벡터-공간">임베딩 차원 = 특징: 사과 비유와 벡터 공간</h3>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> <strong>사과 임베딩</strong>: "사과가 있다"를 특징으로 나눈다. 맛, 크기, 색을 각각 1~3점(색은 3에 가까울수록 빨강, 1에 가까울수록 초록)으로 매기면 사과 하나가 <strong>3차원 공간의 점</strong>이 된다. 맛, 크기, 가격 등 4가지로 나누면 4차원이다. <strong>임베딩 디멘전 = "몇 개의 특징으로 관리할 것인가"</strong>다.</p>
+</aside>
+<ul>
+<li>벌레 먹은 사과는 맛이 떨어지고, 색은 괜찮고, 벌레 먹어 크기도 작다. 이렇게 특징을 놓으면 사과들이 공간 어딘가의 점으로 들어간다. (3, 3, 3)에 아주 좋은 사과가 있다면 그 근처의 사과들도 좋은 사과다. 가까운 것을 찾는 이 방식이 벡터 검색, RAG, 추천의 기반이다.</li>
+<li>차이는 <strong>누가 기준을 정하느냐</strong>다.<ul>
+<li>머신러닝에서는 사람이 특징을 직접 뽑아 결정 트리나 최근접 이웃(nearest neighbor) 같은 것을 돌린다.</li>
+<li>딥러닝 임베딩은 <strong>모델이 스스로 기준을 잡는다.</strong> 차원마다 하나의 특징이지만 <strong>그게 무슨 특징인지 우리는 모른다.</strong> 우리는 특징의 개수(차원 수)만 안다.</li>
+<li>사람 기준보다 <strong>모델 기준으로 뽑게 하면 패턴을 더 잘 찾는다</strong>(머신러닝의 Feature Extraction과 같은 맥락). 그렇게 만든 벡터가 <strong>데이터의 의미를 나타내는 벡터</strong>가 된다.</li>
+</ul>
+</li>
+<li>RGB도 비슷하다. 흰색은 (255, 255, 255), 검은색은 (0, 0, 0)처럼 특징값으로 표현한다. 이런 특징을 알려 주지 않아도 모델이 파악해 흰색, 검은색을 맞히는 것이 딥러닝이 하는 일이다. 사과를 많이 먹어 봐야 맛, 크기, 색이 어떨 때 좋은지 알 듯, 모델도 <strong>많이 학습해야</strong> 어떤 특징인지 볼 수 있다.</li>
+<li>해석은 어렵지만 <strong>두 벡터의 거리가 가까우면 유사하다</strong>는 것은 알 수 있다. 벡터 값을 다 알고 있으니 연산이 되고, 유사도는 <strong>L2 거리, 코사인 유사도</strong> 등으로 계산한다.</li>
+<li>768차원 공간에 "데이터", 방금 만든 커스텀 토큰 <code>walk</code>, "로봇" 같은 단어들이 점으로 쌓인다고 그려 볼 수 있다. 내부는 모두 벡터라 <strong>거리가 곧 유사도</strong>다.</li>
+<li>모델마다 기준이 다르다. 임베딩 모델, BERT 등은 각자의 기준으로 특징을 나누고, 같은 공간에 있어야 계산, 비교가 된다. ChatGPT, BERT 계열 임베딩을 신뢰하는 이유는 텍스트 이해 벤치마크에서 준수한 성능을 냈기 때문이다.</li>
+</ul>
+<h4 id="ch-2-임베딩-공간의-쓰임새-자세한-내용은-다른-장">임베딩 공간의 쓰임새 (자세한 내용은 다른 장)</h4>
+<ul>
+<li><strong>유사도 검색</strong>: 음악 검색, 비슷한 글, 이미지 찾기 대부분이 모델이 출력하는 벡터를 기반으로 한다. 지금 쓰는 LLM, SLM은 <strong>임베딩을 100% 사용</strong>한다.</li>
+<li><strong>문장 임베딩(mean pooling)</strong>: 학습 때는 토큰마다 벡터가 하나씩이지만, RAG용 임베딩은 이를 <strong>평균 내</strong> 문장 하나를 벡터 하나로 만든다. 세 단어 문장이면 3×1,536 대신 1,536차원 벡터 1개다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-3">→ RAG: 임베딩 검색과 ChromaDB</a></li>
+<li><strong>멀티모달</strong>: 텍스트, 이미지, 오디오를 같은 공간에 놓으면 서로 비교할 수 있다. 고양이 사진 두 장과 "고양이" 텍스트를 비교하면 "고양이" 텍스트가 <strong>더 고양이 같은</strong> 사진에 더 가깝게 놓인다. 이것이 "고양이 그려 줘"의 기반 기술이다. 메인 모달리티는 텍스트, 이미지, 오디오 3개이고, 비디오는 오디오+이미지, 문서는 텍스트+이미지의 조합이다.</li>
+<li><strong>BERTScore</strong>: BERT 임베딩 공간에서 두 문장의 유사도를 잰다. 토큰화가 잘못되면 "된다/안 된다", "2%/22%"를 잘 구분하지 못한다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-6">→ 에이전트 평가와 LLM-as-a-judge</a></li>
+</ul>
+<h3 id="ch-2-위치-정보-포지셔널-인코딩">위치 정보: 포지셔널 인코딩</h3>
+<ul>
+<li>들어온 데이터는 임베딩을 통과하고, <strong>포지셔널 인코딩은 상수 값</strong>이라 그냥 <strong>위치를 나타내는 값이 더해진다.</strong> 그래서 토큰 하나가 768차원 벡터로 표현된 상태가 된다. 이제부터 텍스트를 이 벡터로 본다. 이 벡터들은 768차원 공간 안에 뿌려져 있다.</li>
+<li>원래 모델은 단어 순서를 알 수 있게 <strong>사인(sin) 주기 함수</strong>로 만든 포지셔널 인코딩을 임베딩에 <strong>더해</strong> 줬다. 일반적으로는 사인, 코사인 주기 함수 방식은 원본 Transformer의 방식이고, GPT-2 자체는 위치마다 학습되는 위치 임베딩을 더한다. 어느 쪽이든 "임베딩에 더해지는 절대 위치"라는 점은 같다.</li>
+<li>어텐션 계산 자체에는 단어 순서 개념이 없어서 위치 정보를 따로 넣어 준다.</li>
+<li>이 방식은 <strong>절대 위치</strong>만 준다. "나는 학교에 갑니다"는 그냥 1, 2, 3으로 이어지는 번호다. 현대 모델은 이를 <strong>RoPE</strong>로 바꿔 Query, Key에 상대 위치를 넣는다. → <a class="xref" href="#ch-3">→ GPT-2에서 현대 LLM으로</a></li>
+</ul>
+<h3 id="ch-2-layernorm과-residual-블록의-뼈대">LayerNorm과 residual: 블록의 뼈대</h3>
+<ul>
+<li>Explainer 그림의 GPT-2 블록 순서는 <strong>임베딩 → LayerNorm → 어텐션 → LayerNorm → MLP</strong>다. "residual"이라고 표시된 부분은 <strong>skip connection</strong>으로 연결된 부분이다.</li>
+<li>원본 Transformer는 LayerNorm(Add &amp; Norm)이 어텐션, FFN <strong>뒤</strong>에 있었는데(Post-LN) GPT-2는 <strong>앞</strong>에 있다(Pre-LN). 이 변화의 배경(ResNet v2 → ViT → 디코더)은 <a class="xref" href="#ch-3">→ GPT-2에서 현대 LLM으로</a>.</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> <strong>정규화 = 시끄러운 단어들의 데시벨 맞추기</strong>: 단어들은 자기 주장이 굉장히 세다. 임베딩을 막 통과했을 때는 매우 <strong>시끄럽다.</strong> 어떤 단어는 크게 외치고 어떤 단어는 조용히 있으면 무엇이 중요한지 체크가 안 된다. 그래서 <strong>데시벨(크기)을 맞춰 주는</strong> 작업이 정규화다. 그러면 뒤에서 각자 무슨 얘기를 하는지 잘 들을 수 있어 <strong>어텐션 계산이 훨씬 쉬워진다.</strong></p>
+</aside>
+<ul>
+<li>정규화가 뒤에 있든 앞에 있든 역할은 같다. LayerNorm이든 RMSNorm이든 이 역할을 위해 앞에서 한다.</li>
+<li>residual(skip connection)은 ResNet이 "skip connection이 많아 레이어를 매우 깊게 쌓을 수 있었던 모델"이라고 할 때의 바로 그 연결이다. residual 연결은 서브층의 입력을 출력에 그대로 더해 주는 길이라, 블록을 깊게 쌓아도 원래 정보가 사라지지 않게 한다.</li>
+</ul>
+<h3 id="ch-2-셀프-어텐션-query는-요청-key는-검색-대상">셀프 어텐션: Query는 요청, Key는 검색 대상</h3>
+<ul>
+<li>어텐션이 무엇이냐고 물으면 "앞뒤 단어를 비교하는 것", "중요한 부분을 까먹지 않도록 하는 것"이라는 답이 나오는데, 둘 다 맞다.</li>
+<li>보통 수식(Query와 Key를 곱하고 Value를 곱해 비교)으로 배우지만, 왜 행렬을 만들어 곱하는지, Q, K, V가 각각 뭔지 감을 잡기 어렵다. 처음 나왔을 때는 이를 제대로 이해하는 사람이 거의 없었고, 시간이 지나며 구조 설명이 정립됐다. 이걸 왜 Q, K, V로 나눠서 계산하는지를 알아야 어텐션이 해석된다.</li>
+<li>정의는 다음과 같다.<ul>
+<li><strong>Query = 요청</strong></li>
+<li><strong>Key = 검색 대상</strong></li>
+<li>즉 어떤 단어가 주어졌을 때 그 단어가 찾아봐야 할 대상과 <strong>얼마나 연관이 있는지</strong> 계산한다.</li>
+</ul>
+</li>
+<li>Q, K, V에는 <strong>모두 같은 입력값</strong>이 들어간다(셀프 어텐션). 임베딩의 768 값이 처음엔 셋에 똑같이 들어가고, 중간의 <strong>웨이트 레이어</strong>에서 각각 다른 가중치가 곱해진다.</li>
+<li>K와 Q는 자기들끼리 연산해 <strong>attention score</strong>가 되고, V는 원본에 가까운 값으로 전달되다가 마지막에 score와 합쳐진다. 일반적으로는 표준 구현에서 V도 자기 가중치 행렬을 거친 값이다. "원본에 가까운 값에 점수를 곱한다"는 직관으로 읽으면 된다.</li>
+</ul>
+<h3 id="ch-2-마스킹-디코더는-앞-단어만-본다">마스킹: 디코더는 앞 단어만 본다</h3>
+<ul>
+<li>이 설명은 정확히는 <strong>디코더의 어텐션</strong>이다. 디코더는 단어를 순서대로 생성해야 하므로 <strong>다음 단어를 못 보도록 가려 둔다.</strong> 이것이 <strong>마스크</strong>다. 다음 것을 못 보는 상태에서, 주어진 단어가 앞 단어들과 얼마나 연관 있는지 계산한다.</li>
+<li>예문 "Data visualization…"에서 첫 토큰 "Data"는 앞에 단어가 없으니 자기 자신과의 연관만 본다. 두 번째 "visual" 위치에서는 앞의 "Data"와 비교해 얼마나 연관 있는지, 얼마나 중요한지를 계산한다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>구분</th>
+<th>볼 수 있는 범위</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>인코더</td>
+<td>이전, 이후 단어를 모두 본다</td>
+</tr>
+<tr>
+<td>디코더(GPT)</td>
+<td>순서대로 생성해야 하므로 앞 단어들에 대해서만 중요도를 계산한다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>원본 Transformer의 디코더 쪽은 <strong>masked self-attention</strong>이라, 모델이 <strong>한쪽 방향(이전 토큰)만</strong> 볼 수 있게 구조를 막아 둔다. 원본 Transformer, seq2seq 어텐션과의 비교는 <a class="xref" href="#ch-3">→ GPT-2에서 현대 LLM으로</a>.</li>
+</ul>
+<h3 id="ch-2-어텐션-점수와-value-중요한-건-큰-글씨로">어텐션 점수와 Value: "중요한 건 큰 글씨로"</h3>
+<ul>
+<li>예: "나는 학교에 간다"를 Q 쪽과 K 쪽에 똑같이 놓고 계산하면, 각 단어가 앞 단어들과 얼마나 연관 있는지 <strong>점수(score)</strong>가 나온다. softmax를 거쳐 <strong>0~1 사이의 연관도</strong>로 만든다. 의미는 <strong>마지막 단어를 기준으로 앞 단어들을 찾는 것</strong>이다. Explainer에서도 어떤 토큰은 자기 자신과는 별 상관이 없고 앞 토큰들에 따라 값이 바뀌는 것을 점수로 볼 수 있다.</li>
+<li>수식은 차원 수로 정규화하고 Q, K를 곱한 뒤 softmax를 하는 형태다: <code>Attention(Q, K, V) = softmax(QKᵀ / √d_k), V</code></li>
+<li>행렬로 보면 V는 토큰 6개 × 768 벡터, score는 <strong>6×6</strong> 행렬이다. score 행렬을 V에 행렬곱하면 크기는 그대로(6×768)인데, 원본으로 흘러오던 값이 갑자기 attention score와 곱해져 <strong>어텐션이 적용된 값</strong>이 된다.</li>
+</ul>
+<pre><code>score (6×6)  ×  V (6×768)  =  어텐션이 적용된 값 (6×768)
+</code></pre>
+<ul>
+<li>토큰을 늘려 12개로 만들면 어텐션이 6×6에서 <strong>12×12</strong>가 된다. 토큰 수가 늘면 어텐션이 굉장히 커진다(연산 비용 문제와 MQA, GQA는 <a class="xref" href="#ch-3">→ GPT-2에서 현대 LLM으로</a>).</li>
+<li>Value와 점수를 곱하는 의미("나는 학교에 ___"에서 "갑니다"를 예측하는 상황):<ul>
+<li>점수는 중요할수록 1.0, 아닐수록 0.0에 가깝다.</li>
+<li>0.x 값이 곱해지므로 Value는 <strong>무조건 작아지는데</strong>, <strong>중요한 것은 천천히 줄고 중요하지 않은 것은 빨리 준다.</strong></li>
+<li>그래서 시각화하면 중요하지 않은 것은 작아지고 중요한 것은 커진다.</li>
+</ul>
+</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> 학습이 다 된 모델이 컨텍스트를 볼 때는 어텐션 점수가 곱해진 실제 값(Value)을 보는 셈이다. 즉 컨텍스트를 <strong>중요한 건 큰 글씨로, 아닌 건 작은 글씨로</strong> 본다.</p>
+</aside>
+<ul>
+<li>어텐션 레이어가 <strong>컨텍스트에 집중하는 부분 전체를 관장</strong>한다고 봐도 된다. 앞 단어들의 컨텍스트를 모두 검증해 출력을 만든다. 어떤 단어가 중요해질지 사람이 미리 예측할 수는 없지만, <strong>사람들이 중요하다고 판단하는 패턴</strong>을 여기서 찾는다.</li>
+</ul>
+<h4 id="ch-2-멀티헤드-어텐션-헤드-정보를-종합">멀티헤드 어텐션: 헤드 정보를 종합</h4>
+<ul>
+<li>레이어 하나에 <strong>어텐션 헤드가 굉장히 많이</strong> 있고, 각 헤드의 정보가 <strong>모두 종합되어</strong> 다음 단계(MLP)로 넘어간다. Explainer의 GPT-2 small은 <strong>헤드 12개</strong>다(더 많은 모델도 있다). 헤드 정보를 종합하는 방식은 평균을 내거나 모델로 정리하는 것으로 설명할 수 있는데, 일반적으로는 표준 Transformer/GPT-2 구현에서 헤드 출력을 이어 붙인(concat) 뒤 선형 투영(output projection)한다.</li>
+</ul>
+<h3 id="ch-2-프롬프트를-반복하면-왜-강조되나">프롬프트를 반복하면 왜 강조되나</h3>
+<ul>
+<li>어텐션이 큰 값들이 컨텍스트 안에서 <strong>여러 번 반복</strong>되면, 컨텍스트 전체에서 그 부분들이 어텐션을 많이 가져갈 수밖에 없다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> <strong>바다 이야기 재소환</strong>: 조건이 달라지면 확률이 바뀐다. 우리가 컨텍스트, 프롬프트를 쓴다고 어텐션 점수를 직접 조절하지는 못하지만, <strong>"큰 글씨"가 계속 반복되게 만들 수는 있다.</strong> "나는 어제 학교에 갔는데, 학교는 내가 안 가도…"처럼 같은 단어가 반복되면 어텐션 점수가 누적돼 모델이 그 부분을 더 중요하게 본다.</p>
+</aside>
+<ul>
+<li>Value는 원본 데이터에 점수만 곱해 넘기는 형식이라, 우리가 쓰는 컨텍스트는 <strong>항상 어텐션 점수가 계산된 채로</strong> 다음 단계로 넘어간다.</li>
+<li>강조하고 싶은 내용을 자연어로 반복하면 실제로 강조된다. "어텐션에서 스코어들이 누적되기 때문"이다. 다만 사람이 의도해 만든 기능이 아니라 <strong>모델이 그렇게 학습한 결과</strong>다. 구조를 이해하면 "프롬프트를 중복해서 쓰는 게 도움이 될까"에도 답할 수 있다.</li>
+<li>어텐션이 실제로 어떤 점수를 매기는지는 알 수 없지만, 특징을 뽑는 방식 자체가 사람이 단어, 문장을 인식하는 방식이다. 그래서 <strong>사람이 문장을 강조하는 방법대로 강조하면</strong> 모델이 그 부분을 파악해 특징을 인식하고 패턴을 찾는다. 결국 <strong>특징을 잘 뽑게끔 프롬프트를 쓰는 것이 프롬프트 엔지니어링</strong>이다.</li>
+<li>에이전트 툴의 컨텍스트 현황 화면(context usage 17%, 항목은 시스템 프롬프트, 툴 정의, 스킬, 서브에이전트 정의, 메모리, 대화)을 보면, 툴 description부터 유저 프롬프트까지 모두 컨텍스트에 들어가고 모델 입장에선 그 안에서 어텐션 중요도("글씨 크기")가 전달된다. → <a class="xref" href="agentic-ai-1-agent-basics.html#ch-3">→ 프롬프트 엔지니어링</a> <a class="xref" href="agentic-ai-1-agent-basics.html#ch-4">→ 컨텍스트 엔지니어링과 하네스</a></li>
+</ul>
+<!-- -->
+
+<aside class="callout sum">
+<p><strong>정리</strong> 반복, 강조가 먹히는 이유는 어텐션 점수가 누적되기 때문이다. 우리가 손댈 수 있는 것은 점수가 아니라 조건(프롬프트)이다.</p>
+</aside>
+<h3 id="ch-2-어텐션은-특징-추출-mlp는-패턴-찾기">어텐션은 특징 추출, MLP는 패턴 찾기</h3>
+<ul>
+<li>트랜스포머에서 <strong>어텐션 네트워크가 특징을 추출</strong>한다. Explainer 예라면 "data와 power가 연관이 있는 것 같고, visualization과 to가 연관이 있는 것 같다"를 뽑는 것이다.</li>
+<li><strong>MLP는 패턴을 찾는 부분</strong>이다. "사람들이 data와 power를 중요하게 봤다면, 'to' 다음에 올 수 있는 단어를 어떤 패턴으로 분석해 볼까? 사람들이 이런 시퀀스를 쓰면 어떤 패턴을 만들까?"를 찾기 시작한다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>예시</strong> "오늘부터 방학이어서 집에 나는 ___": 빈칸에 "가자", "가세요", "집으로 가자" 등이 들어갈 수 있다. 사람도 이 문장의 패턴을 이미 학습한 상태라 "오늘", "방학", "집에"가 중요하고 이런 문장 끝에는 문장을 마무리하는 단어가 온다는 것을 안다. GPT도 똑같이 <strong>어텐션이 중요한 단어를 파악해 MLP에 넘기면</strong>, MLP가 "오늘, 방학, 집에가 있으면 '집에 가자'가 사람들이 많이 쓰는 패턴"이라고 인식하고 <strong>확률대로 단어를 고른다.</strong></p>
+</aside>
+<ul>
+<li>핵심 요약:<ul>
+<li><strong>어텐션</strong>: 들어온 데이터를 분석한다. 어떤 컨텍스트가 중요한지를 본다.</li>
+<li><strong>MLP(MoE)</strong>: 실제 단어 예측 패턴을 담당한다. 컨텍스트를 바탕으로 어떤 단어를 고를지 결정한다.</li>
+<li>Transformer block은 이 둘이 여러 레이어로 쌓인 구조다. "용어가 어렵지 동작은 이 두 가지"다.</li>
+</ul>
+</li>
+<li>그래서 프롬프트 엔지니어링을 포함해 LLM에 들어가는 <strong>모든 조건은 어텐션의 영향을 받을 수밖에 없다.</strong></li>
+</ul>
+<h3 id="ch-2-mlp의-4배-확장-768-3072-768">MLP의 4배 확장: 768 → 3072 → 768</h3>
+<ul>
+<li>CNN/DNN은 레이어가 점점 줄어드는데, 트랜스포머 MLP는 <strong>오히려 늘어난다.</strong> 보통 <strong>4배</strong>다. MLP 레이어가 왜 4배로 늘었다가 다시 줄어드는지가 궁금해지는 지점이다.</li>
+<li>MLP 입력이 <strong>768</strong>이면 4배인 <strong>3072</strong>로 늘렸다가 다시 <strong>768</strong>로 압축한다. 구현상 그냥 곱해서 늘린다. Explainer에서는 <strong>expansion weight</strong>로 어텐션이 계산된 임베딩을 3000여 차원으로 늘리고, <strong>compression weight</strong>로 다시 줄인다.</li>
+</ul>
+<pre><code>어텐션이 적용된 768 → (expansion weight) → 3072 → (compression weight) → 768
+</code></pre>
+<ul>
+<li>왜 4배인가에 대한 해석, 논문은 많다. 쉬운 설명은 이렇다. 고차원 공간에 <strong>단어 패턴의 형태를 많이 저장해 놓고 다시 압축하면서 패턴을 정제</strong>한다. 많은 패턴을 구성해 놓고 압축하며 가장 적절한 패턴을 맞춰 가는 작업이다. "이런 패턴에서는 이런 단어를 쓴다"를 벡터 연산으로 만들어 가므로, 이 부분이 실제로 <strong>단어를 예측하는 부분</strong>이다.</li>
+<li><strong>"MLP에 지식이 저장된다"</strong>는 말에 대해: LLM 연구에서 그렇게 말하기도 하지만, 정확히는 지식이 저장되는 게 아니라 <strong>우리가 쓰는 언어(단어)의 패턴이 대부분 여기서 학습</strong>된다.<ul>
+<li>"MLP에 지식이 주입된다"는 이해하기 쉬운 비유였고, 정확히는 <strong>어텐션 결과를 보고 단어 생성 패턴을 예측</strong>하는 곳이다. 결국 학습 때 많이 본 패턴을 만들어 낸다.</li>
+<li>QLoRA 그림에서 MLP 블록을 가리키며 "지식은 여기 있다"고 말하기도 하지만, 기억한다기보다 <strong>패턴을 매칭시키고 찾는</strong> 곳이다. 이 블록을 동결하면 지식 추가가 어렵다. → <a class="xref" href="#ch-4">→ 모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</a></li>
+</ul>
+</li>
+<li>활성화 함수: MLP 마지막 단이 <strong>GELU activation</strong>이라고 설명하기도 하는데, 일반적으로는 GPT-2에서 GELU는 확장(768→3072)과 압축(3072→768) 사이에 들어간다. 현대 모델의 활성화 함수 변화는 <a class="xref" href="#ch-3">→ GPT-2에서 현대 LLM으로</a>.</li>
+</ul>
+<h3 id="ch-2-블록-반복-768이-들어가면-768이-나온다">블록 반복: 768이 들어가면 768이 나온다</h3>
+<ul>
+<li>지금까지 본 것은 <strong>트랜스포머 블록 하나</strong>다. 작은 모델인 GPT-2 small은 블록이 <strong>11개 더</strong>, 총 <strong>12개</strong> 있고, 데이터가 디코더 파트를 계속 통과한다.</li>
+<li>전통 모델과의 차이: CNN/DNN은 목표 클래스 수만큼 크기가 줄어야 하므로 <strong>사다리꼴</strong>로 그리며 점점 압축된다. 그만큼 레이어를 더 쌓을 여지가 줄어든다.</li>
+<li>트랜스포머는 <strong>768이 들어가면 768이 나온다.</strong> 임베딩된 768이 Q, K, V로 똑같이 복사되고, 멀티헤드 어텐션 결과가 차곡차곡 쌓여 MLP 입력도 768, 출력도 768이다. 어텐션, MLP를 지나며 특징이 <strong>강조된 형태</strong>로 나올 뿐 차원은 유지된다.</li>
+<li>그래서 구조가 깔끔해 <strong>같은 디코더에 그대로 다시 넣을 수 있다.</strong> 이론적으로는 계속 쌓을 수 있고, 통과할수록 어텐션 추가 → 분석 → 패턴 가져오기가 누적돼 계속 강조된다.</li>
+<li>GPT-2는 처음에 12층, 24층 모델 등으로 나왔고, GPT-3 등에서는 레이어가 크게 늘었다.</li>
+<li>관련 연구로, LLM이 <strong>특정 레이어를 지나면 자기들 나름의 언어(패턴)로 생각하고, 출력할 때 번역해서 알려 준다</strong>는 논문이 있다. 중간쯤부터 언어별 패턴이 흐려진다는 실험이다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout sum">
+<p><strong>정리</strong> 블록 = (정규화 →) 마스크드 셀프 어텐션 + (정규화 →) MLP, 그리고 residual. 입출력 크기가 같아서 같은 블록을 여러 층 쌓는다.</p>
+</aside>
+<h3 id="ch-2-로짓-softmax-temperature">로짓, softmax, temperature</h3>
+<ul>
+<li>블록을 다 통과한 값이 에이전트 구현 때 쓰는 <strong>temperature, top-k, top-p</strong> 같은 출력 정제 파라미터와 연결된다. 블록이 여러 레이어 쌓인 뒤 <strong>LM head</strong>를 거쳐 단어로 출력된다.</li>
+<li><strong>logits</strong> = 마지막 activation 전에 모델에서 나온 값, 즉 모델이 예측한 <strong>연속값</strong>이다. 여기에 softmax를 취하면 각 토큰(클래스)의 확률이 된다.</li>
+<li>Explainer에서 temperature 1일 때 최상위 후보("visualize")가 47.36%, 그다음 "create" 21% … 순으로 떨어졌다. 원하던 답 "make"는 제대로 예측되지 않았다.</li>
+<li><strong>temperature는 생성 모델에 항상 존재하고 기본값은 1</strong>이다. 원리는 <strong>로짓을 temperature로 직접 나눈 뒤 softmax</strong>를 하는 것이다. 그래서 temperature 값에 따라 출력이 꽤 많이 바뀐다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>temperature</th>
+<th>분포</th>
+<th>결과</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>원래 확률 그대로</td>
+<td>기본값</td>
+</tr>
+<tr>
+<td>1보다 낮게 (Explainer 슬라이더는 0.2까지)</td>
+<td>상위 결과가 강화돼 1등 확률이 더 높아진다. "visualize" 확률이 크게 올랐다</td>
+<td>고정적, 딱딱한 답</td>
+</tr>
+<tr>
+<td>0</td>
+<td>사실상 1등만 남는다</td>
+<td>가장 확률이 높은 토큰만 쓴다(greedy)</td>
+</tr>
+<tr>
+<td>1보다 높게</td>
+<td>후보들의 확률이 비슷해진다(분포가 평평해짐)</td>
+<td>다양한 답. 1을 넘기면 분포가 깨지기 시작한다</td>
+</tr>
+<tr>
+<td>10 이상</td>
+<td>확률이 거의 다 비슷해진다</td>
+<td>거의 랜덤. 확률 분포가 제대로 동작하지 않는다</td>
+</tr>
+</tbody>
+</table></div>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> 이름이 "온도"인 이유: 낮으면 <strong>추운</strong> 상태라 매우 고정적이고 딱딱한 답을, 높으면 <strong>뜨거운</strong> 상태라 다양한 답을 만든다. 이런 이름으로 생성을 제어하는 방식이 예전부터 쓰였다.</p>
+</aside>
+<ul>
+<li>범위: 원래는 0부터 꽤 큰 값까지 쓸 수 있지만 <strong>OpenAI는 0~2만 허용</strong>한다. <code>ChatOpenAI(model, api_key, base_url, temperature, max_tokens)</code>에서 설정한다.</li>
+<li>식으로 쓰면 <code>p_i = softmax(z_i / T)</code>다. T→0이면 최댓값 하나로 몰리고, T가 크면 균등 분포에 가까워진다.</li>
+</ul>
+<h3 id="ch-2-샘플링-top-k-top-p와-temperature-0">샘플링: top-k, top-p와 temperature 0</h3>
+<ul>
+<li>기본적으로는 이 확률 분포에서 <strong>샘플링</strong>해 토큰을 뽑는다. 그래서 1등이 아닌 "make"가 나올 수도 있다.</li>
+<li><strong>temperature 0</strong>: 0으로는 나눌 수 없으니 실제로는 아주 작은 <strong>epsilon</strong>을 더해 0이 아닌 값으로 나누고, 결과적으로 <strong>가장 확률이 높은 토큰만 쓰겠다</strong>는 의미가 된다. 에이전트 예제에서 많이 쓴다. 일반적으로는 구현에서 temperature 0은 확률 샘플링이 아니라 argmax(greedy) 선택으로 처리된다.<ul>
+<li>SLM에서는 꽤 괜찮은 전략이다. 확률 분포 자체가 애매해서 오히려 강력하게 동작한다.</li>
+<li>단점: 다양한 답을 못 만들고, 누가 어떻게 물어도 거의 같은 답을 내는 딱딱한 모델이 된다.</li>
+<li>그래서 <strong>번역, 요약처럼 가장 높은 확률로 예측한 값을 보고 싶을 때는 temperature 0</strong>, 그 외엔 조금 올려 다양한 단어가 나오게 한다.</li>
+</ul>
+</li>
+<li><strong>top-k, top-p</strong>: Explainer는 토큰이 한 단어 단위라 후보가 적지만, ChatGPT처럼 <strong>10만 개가 넘는 토큰</strong>을 가진 모델은 샘플링 범위를 넓히는 순간 확률이 쫙 퍼져 나오지 말아야 할 토큰까지 만에 하나 나올 수 있다. 그래서 후보를 자른다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>옵션</th>
+<th>방식</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>top-k</td>
+<td>상위 몇 개까지만 확률을 준다</td>
+</tr>
+<tr>
+<td>top-p</td>
+<td>누적 확률 분포를 만들어 정해진 누적 확률까지만 후보로 둔다. 확률이 더해졌을 때 100%가 되는 것까지만 본다는 뜻이다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>이 옵션들은 OpenAI 등 API에서 실제로 쓸 수 있지만, <strong>에이전트 단에서는 샘플링까지 제어하지 않고 temperature 수준에서 제어</strong>하는 게 보통이다.</li>
+</ul>
+<h4 id="ch-2-temperature-0인데도-답이-바뀌는-이유">temperature 0인데도 답이 바뀌는 이유</h4>
+<p>원래는 같은 답이 나와야 맞지만 실제로 돌려 보면 다르게 나올 때가 있다. 이유는 세 가지다.</p>
+<ol>
+<li><strong>후보 확률이 0%가 되지 않는다</strong>: 1등 "visualize" 외의 후보도 확률이 완전히 0이 되지 않는다. 그래서 100번 중 97~98번은 "visualize"가 나와도 "create"가 2% 확률로 나올 수 있다.</li>
+<li><strong>부동소수점 연산</strong>: 토큰 간 확률 차이가 매우 작은 경우가 있다. 예를 들어 "W, E"까지 입력했을 때 다음 후보 두 개의 확률이 근소하다가 어느 자리에서 순위가 뒤집힐 수 있다. CPU, GPU 특성상 소수점 자릿수가 달라질 수 있어 같은 입력이어도 선택이 바뀐다. 자기회귀라 한 토큰이 바뀌면 이후 단어가 모두 바뀐다("WEE가 들어가면 K, WEEA가 들어가면 다른 단어").</li>
+<li><strong>GPU 배치 처리</strong>: 서버는 여러 사람의 요청을 배치로 묶어 처리하는데, 배치 크기에 따라 연산 결과가 달라질 수 있다. 이를 실험한 연구소(Thinking Machines Lab의 실험으로 보인다)에 따르면 별도 처리 없이 돌리면 1000번 중 약 80번은 다른 답이 나왔고, 로컬 서빙에서 이를 통제하도록 만들자 속도가 30~60% 느려졌다.</li>
+</ol>
+<p>일반적으로는 temperature 0은 보통 argmax로 처리되므로 실제 비결정성의 주원인은 2번(부동소수점)과 3번(배치 처리)이다. 1번은 "temperature를 아주 낮춰도 샘플링을 하면 하위 후보가 나올 수 있다"는 직관으로 이해하면 된다. 평가 관점에서의 대응은 <a class="xref" href="agentic-ai-2-agent-features.html#ch-6">→ 에이전트 평가와 LLM-as-a-judge</a>.</p>
+<h3 id="ch-2-출력은-토큰-id-디코딩-eos-그리고-다음-바퀴">출력은 토큰 ID: 디코딩, EOS, 그리고 다음 바퀴</h3>
+<ul>
+<li>모델이 실제로 만드는 것은 단어가 아니라 <strong>ID</strong>(토큰 ID)다. 모델 뒤쪽에서 숫자를 만들어 ID를 찾아내고, 이 ID를 <strong>토크나이저가 단어로 변환</strong>한다. 예: ID <code>65, 77, 88</code>을 번역했더니 문장이 된다.</li>
+<li>모델 입장에서는 글씨가 아니라 <strong>전부 숫자</strong>(6, 10, 20, 50 같은 토큰 ID)이고, 이를 Vocab 사전으로 변환하면 사람이 볼 수 있는 글자가 된다.</li>
+<li>뽑힌 토큰은 입력 끝에 붙어 다시 <strong>조건</strong>이 되고, 전체가 다시 들어가 다음 토큰을 만든다(자기회귀). → <a class="xref" href="#ch-1">→ LLM과 딥러닝의 기본 원리</a></li>
+<li>언제 멈추나: 가장 유명한 커스텀 토큰 <strong>BOS</strong>(문장 시작), <strong>EOS</strong>(문장 끝)를 쌍으로 쓴다. 실제 추론 중 <strong>EOS가 나오면 생성 루프(for문, while문)를 종료</strong>하고 문장을 반환한다.</li>
+<li>그래서 <strong>나오는 토큰을 보고 원하는 동작, 기능을 실행</strong>하도록 구현할 수 있다. 채팅, 툴콜, thinking 형식이 모두 이 원리다. → <a class="xref" href="#ch-4">→ 모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</a></li>
+</ul>
+<p>(설명용 의사 코드이며 실제 라이브러리 코드가 아니다)</p>
+<pre><code class="language-python">tokens = tokenizer.encode(prompt)            # 문장 → 토큰 ID (번호표)
+while True:
+    logits = model(tokens)[-1]               # 블록 12개 통과, 마지막 위치의 로짓
+    probs = softmax(logits / temperature)    # temperature로 나눈 뒤 확률로
+    next_id = sample(probs, top_k, top_p)    # 분포에서 하나를 뽑는다
+    if next_id == EOS_ID:                    # EOS가 나오면 생성 종료
+        break
+    tokens.append(next_id)                   # 생성한 토큰이 다시 조건이 된다
+text = tokenizer.decode(tokens)              # 토큰 ID → 사람이 읽는 글자
+</code></pre>
+<h3 id="ch-2-컨텍스트-길이-어텐션이-계산되는-길이">컨텍스트 길이 = 어텐션이 계산되는 길이</h3>
+<ul>
+<li>마지막 단어는 <strong>앞에 있는 모든 토큰에 어텐션을 계산</strong>해야 한다. 컨텍스트를 넣으면 거기에 대한 어텐션 계산을 다 해야 하므로, <strong>어텐션을 계산하는 이 길이가 곧 컨텍스트</strong>다.</li>
+<li>모델에는 원래 입력 가능한 최대 길이(최대 토큰)가 있고, 롱 컨텍스트를 잘 보도록 따로 학습시키기도 한다.</li>
+<li>길이의 역사: 초창기 입력은 약 <strong>8,000 토큰</strong>이었고, 입력과 출력 길이가 거의 같던 시기도 있었다. 그래서 데이터를 정제해 일부만 넣어야 했고, 이것이 청크 기반 RAG가 발전한 배경이다. 이후 롱 컨텍스트 트레이닝으로 50만을 거쳐 <strong>100만(1M) 토큰</strong>까지 왔다.</li>
+<li>롱 컨텍스트 처리에 대한 개념적 설명: 1M 토큰을 본다고 해서 토큰이 그대로 다 어텐션에 들어가는 게 아니라, 학습된 롱 컨텍스트 처리로 입력 토큰을 나름대로 <strong>압축</strong>해서 넣는다. 그 압축은 대부분 딥러닝 모델이 하므로 어떤 패턴으로 하는지 우리는 알 수 없지만, 언어 모델이므로 <strong>중요하게 반복한 텍스트</strong>를 강조로 반영한다. 옛날 모델은 8,000개 정도까지는 확실했고, 롱 컨텍스트의 정확한 어텐션 개수는 확인이 필요하다. 이 "압축" 설명은 개념적인 설명이며, 모델별 실제 구현은 따로 확인해야 한다.</li>
+</ul>
+<h4 id="ch-2-넣을-수-있다-다-본다">넣을 수 있다 ≠ 다 본다</h4>
+<p>아래는 여러 실험, 벤치마크에서 인용되는 수치로, 정확한 값은 다시 확인이 필요하다.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>출처, 대상</th>
+<th>인용되는 수치</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Claude 4.5, GPT-5, Gemini 3 시점 실험</td>
+<td>컨텍스트가 길어져도 90% 이상 유지한 건 Gemini뿐, 나머지는 70~80%</td>
+</tr>
+<tr>
+<td>롱 컨텍스트 벤치마크</td>
+<td>Claude 약 79%로 최고, 표에는 없지만 Gemini도 롱 컨텍스트를 잘 본다</td>
+</tr>
+<tr>
+<td>Claude 계열</td>
+<td>약 256K 이하에서 90% 이상, 512K를 넘으면 77~79%</td>
+</tr>
+<tr>
+<td>SLM, 128K 벤치마크</td>
+<td>가장 좋은 모델 약 66% → 실질 6만~7만 토큰. 작은 모델 약 13% → 약 1.5만 토큰. "처참"하다</td>
+</tr>
+<tr>
+<td>정리</td>
+<td>1M을 넣어도 실제로는 <strong>70~80% 정도만 인식</strong></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>원인은 <strong>어텐션 메커니즘의 한계</strong>다. 어텐션의 학습 편향 때문에 컨텍스트를 고르게 보지 못하고, 앞과 뒤를 더 잘 보고 중간을 놓친다. 이것이 <strong>Lost in the Middle</strong>이다. Claude Code나 Codex가 컨텍스트가 차면 압축해 넘길 때도 데이터 손실이 계속 생긴다.</li>
+<li>같은 성질(앞쪽, 뒤쪽 단어에 어텐션이 몰림)이 LLM-as-a-judge가 앞에 놓인 답을 정답으로 고르는 위치 편향으로 나타난다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-6">→ 에이전트 평가와 LLM-as-a-judge</a></li>
+<li>SLM은 구조상 컨텍스트 유지 능력이 많이 떨어진다.</li>
+<li>노이즈의 영향: 컨텍스트에 틀린 정보 같은 노이즈가 있으면 모델이 걸러 내지 못할 때가 있고, 너무 많이 누적되거나 길어지면 모델이 <strong>자기가 학습한 패턴 인식보다 컨텍스트에 더 의존</strong>한다는 실험 결과가 있다.</li>
+<li>그래서 1M을 넣을 수 있어도 모델이 모든 내용을 균일하게 보지 못하니 RAG, MCP, Function Calling이 여전히 필요하다.</li>
+</ul>
+<h4 id="ch-2-에이전트-실무로의-연결">에이전트 실무로의 연결</h4>
+<ul>
+<li>컨텍스트를 잘못 쓰면 모델 성능이 "뚝뚝" 떨어진다. 컨텍스트 윈도우를 아껴 쓰고, 한 단계 작업이 끝날 때마다 마크다운으로 정리해 새 대화에서 이어 가는 것이 좋다.</li>
+<li>서브에이전트로 컨텍스트를 분리하면 메인 컨텍스트가 줄어 <strong>어텐션 계산이 여유로워지고</strong> 더 정확한 패턴을 찾을 수 있다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-5">→ 서브에이전트, 멀티에이전트, 워크플로</a></li>
+<li>system → tools → user 순으로 쌓이는 컨텍스트에서 고정된 앞부분은 따로 저장해 두고(<strong>캐싱</strong>) 사용료를 50% 깎아 주는 식의 작업이 들어가 있다.</li>
+<li>컨텍스트 관리 전략(외부 저장, 선택, 압축, 분할)과 Lost in the Middle의 실무 대응은 <a class="xref" href="agentic-ai-1-agent-basics.html#ch-4">→ 컨텍스트 엔지니어링과 하네스</a>.</li>
+</ul>
+<h3 id="ch-2-정리-디코더-한-바퀴와-에이전트-파라미터">정리: 디코더 한 바퀴와 에이전트 파라미터</h3>
+<ul>
+<li>흐름을 한 번에 다시 정리하면 다음과 같다.<ol>
+<li>딥러닝의 모든 입력은 벡터다. 자연어가 토큰 ID(번호표)로 바뀌고, 임베딩 레이어가 <strong>768차원 벡터</strong>로 만든다.</li>
+<li>그 768 값이 Q, K, V에 똑같이 들어가고, 웨이트 레이어에서 각각 가중치가 곱해진다.</li>
+<li>K와 Q가 연산해 <strong>6×6 attention score</strong>가 되고, 이를 V(6×768)에 곱해 <strong>어텐션이 적용된 값</strong>이 된다.</li>
+<li>원본과 달리 패턴이 생긴 이 값을 보고 MLP가 "to 다음에는 create가 올 것 같다"고 예측한다.</li>
+<li>프롬프트를 넣으면 이 동작이 <strong>모든 블록을 통과할 때까지 똑같이 반복</strong>된다.</li>
+</ol>
+</li>
+<li>최소한의 이해는 이 한 줄이다. <strong>"어텐션에서 특징을 추출하고, MLP에서 패턴으로 문장을 만든다. 패턴이 MLP에 다져진다."</strong> 여기서 본 것은 간단한 디코더 하나를 뜯어본 것이다.</li>
+<li>모델 내부 값 중 상당수가 에이전트 구현 때 <strong>파라미터로 넘어온다</strong>(temperature, top-k, top-p, max_tokens). 이를 이용해 생성을 조금이라도 제어한다.</li>
+<li>텍스트가 임베딩으로 바뀐 이후는 사람이 통제하기 매우 어려운 <strong>학습의 영역</strong>이다. 그래서 내부를 튜닝하기보다 특징과 패턴을 잘 인식하도록 프롬프트, 컨텍스트를 설계한다. 에이전트도 시스템 프롬프트, 유저 입력, 스킬, MCP, 플러그인을 컨텍스트로 받아 <strong>다음 단어를 예측</strong>할 뿐, GPT 구조가 달라진 것은 아니다. 바뀐 것은 컨텍스트 관리 방식에 대한 논의다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout tip">
+<p><strong>팁</strong> LLM, SLM 회사 면접 질문 예: "왜 MLP 레이어가 mixture(MoE)로 쓰이나?", "디스틸할 때 어떤 분포를 가지고 해야 하나?", "양자화했을 때 어떤 지표를 봐야 하나?" 모두 트랜스포머 디코더 구조에 기반한 질문이다. → <a class="xref" href="#ch-3">→ GPT-2에서 현대 LLM으로</a> <a class="xref" href="#ch-4">→ 모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</a></p>
+</aside></div></section>
+<section class="chapter" id="ch-3"><header class="ch-head"><div class="ch-no">주제 3</div><h2>GPT-2에서 현대 LLM으로</h2><p class="lede">GPT-2 구조를 출발점으로 정규화 위치(Pre-LN), 위치 정보(RoPE), 정규화 방식(RMSNorm), 어텐션(MQA, GQA, MLA, 게이트), MLP(MoE)가 어떻게, 왜 바뀌었는지 정리한다. 업스테이지 Solar 사례, 새 모델을 따라가는 법, 트랜스포머 너머의 연구 동향까지 담았다.</p></header><div class="prose"><h3 id="ch-3-왜-구조-변화를-보나-기본-구조-안에서-무엇을-바꿨나">왜 구조 변화를 보나: "기본 구조 안에서 무엇을 바꿨나"</h3>
+<ul>
+<li>원본 Transformer → GPT → 현대 모델로 이어지는 흐름을 보면, GPT-2까지는 얼마 전까지 최신 모델이었지만 지금은 멀티헤드 어텐션이 다른 구조로, MLP가 다른 구조로 바뀌는 중이다. 이 흐름을 알아야 GPT-5 같은 최신 모델이나 SLM을 공부할 때, 그리고 최근 AI판에서 무슨 일이 일어나는지 파악할 때 도움이 된다. DeepSeek 등이 도입한 어텐션 계산이나 MLP 처리 같은 최근 LLM 연구도 이 흐름의 연장선이다.</li>
+<li>앞으로 나올 SLM/LLM 논문에도 <strong>이 구조가 그대로</strong> 나온다. 다만 블록 안의 특정 부분이 조금씩 바뀐다. 예를 들어 지금은 그냥 쭉 이어지는 어텐션 부분에 <strong>정규화를 넣거나</strong>, 레이어를 하나 빼서 <strong>게이트(gate)를 만들어 추가</strong>하는 식이다. 논문을 볼 때 "여기서 무엇을 건드렸는지, 어떻게 튜닝했는지"를 보면 발전 흐름이 바로 보인다.</li>
+<li>파트가 하나씩 바뀌는 이유는 결국 <strong>성능</strong>이다. 딱딱하게 보기보다 "무엇이 왜 바뀌는지"를 보는 것이 좋고, 이 부분은 교양으로 읽어도 충분하다.</li>
+</ul>
+<h3 id="ch-3-원본-transformer에서-gpt로">원본 Transformer에서 GPT로</h3>
+<ul>
+<li>원본 Transformer 그림은 왼쪽이 <strong>인코더</strong>, 오른쪽이 <strong>디코더</strong>다. GPT는 이 중 <strong>디코더만 떼어 와</strong> 텍스트를 생성시키는 모델이다.</li>
+<li>seq2seq 어텐션과 Transformer 어텐션을 비교하면 다음과 같다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>구조</th>
+<th>어텐션</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RNN 기반 sequence-to-sequence</td>
+<td>어텐션이 하나뿐</td>
+</tr>
+<tr>
+<td>원본 Transformer</td>
+<td>두 종류 이상. 인코더 쪽 self-attention, 인코더-디코더 사이 어텐션, 디코더 쪽 <strong>masked self-attention</strong></td>
+</tr>
+<tr>
+<td>GPT(디코더만)</td>
+<td>masked self-attention. 한쪽 방향(이전 토큰)만 볼 수 있게 구조를 막아 둔다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>기존 Transformer/GPT는 임베딩, residual 연결, 멀티헤드 어텐션, MLP로 된 Transformer block으로 동작하는 <strong>"가장 초창기의 모습"</strong>이고, 지금은 여기서 변화하는 중이다.</li>
+<li>디코더 블록 자체의 동작은 <a class="xref" href="#ch-2">→ Transformer 블록 해부</a>.</li>
+</ul>
+<h3 id="ch-3-gpt-2-vs-현대-llm-한눈에-보기">GPT-2 vs 현대 LLM 한눈에 보기</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>부위</th>
+<th>GPT-2 (Transformer Explainer)</th>
+<th>현대 LLM, SLM</th>
+<th>바꾼 이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>정규화 위치</td>
+<td>Pre-LN (원본 Transformer는 Post-LN)</td>
+<td>어텐션 앞뒤로 정규화</td>
+<td>정규화를 먼저 하니 성능이 올랐다 (ResNet v2 → ViT → 디코더)</td>
+</tr>
+<tr>
+<td>정규화 방식</td>
+<td>LayerNorm</td>
+<td>RMSNorm</td>
+<td>제곱을 이용한 최근 기법. 어텐션 계산을 돕는다</td>
+</tr>
+<tr>
+<td>위치 정보</td>
+<td>사인 주기 함수 포지셔널 인코딩을 임베딩에 <strong>더함</strong>(절대 위치)</td>
+<td>Query, Key에 <strong>RoPE</strong> 적용(상대 위치). 일부는 NoPE</td>
+<td>단어를 상대적으로 참조하면 성능이 좋아진다</td>
+</tr>
+<tr>
+<td>어텐션</td>
+<td>멀티헤드 어텐션(MHA)</td>
+<td>GQA, MQA, MLA, 게이트, 하이브리드(linear attention)</td>
+<td>행렬곱 비용을 줄이고 중요한 것만 남긴다</td>
+</tr>
+<tr>
+<td>MLP</td>
+<td>MLP 하나 (768 → 3072 → 768)</td>
+<td>MoE (라우터 + 여러 expert, shared expert)</td>
+<td>패턴을 담는 용량을 키운다</td>
+</tr>
+<tr>
+<td>활성화 함수</td>
+<td>GELU</td>
+<td>다른 활성화 함수 (SiLU 등을 쓴 게이트형 구조)</td>
+<td>조금씩 개선</td>
+</tr>
+<tr>
+<td>출력</td>
+<td>블록 반복 → LM head → 단어</td>
+<td>동일</td>
+<td>없음</td>
+</tr>
+</tbody>
+</table></div>
+<p>현대 모델의 FFN은 SwiGLU 계열이 많다. 일반적으로는 GPT-2의 위치 정보는 실제로는 학습되는 위치 임베딩이고, 사인 주기 함수 방식은 원본 Transformer의 방식이다. GPT-2 쪽 자세한 설명은 <a class="xref" href="#ch-2">→ Transformer 블록 해부</a>.</p>
+<ul>
+<li>현재의 가장 공통적인 구조는 "토큰 임베딩, 위치 인코딩, 어텐션, MLP(MoE), 마지막 단어 예측"이다. 한 줄로 외우면 <strong>임베딩 → RoPE → 어텐션 → MoE, 그리고 중간중간 정규화</strong>다. 이걸 머리에 넣고 최신 논문을 보면 따라갈 수 있다.</li>
+</ul>
+<h3 id="ch-3-변화-1-post-ln에서-pre-ln으로">변화 1: Post-LN에서 Pre-LN으로</h3>
+<ul>
+<li>원본 Transformer는 LayerNorm(Add &amp; Norm)이 <strong>어텐션과 FFN 뒤</strong>에 있다(Post-LN). GPT-2 그림은 LayerNorm이 <strong>앞</strong>에 있다(Pre-LN). 첫 번째 구조 변화다.</li>
+<li>출처는 <strong>ResNet</strong> 연구다. ResNet은 skip connection이 많아 레이어를 매우 깊게 쌓을 수 있었던 모델이다. 대부분이 배운 것은 <strong>ResNet v1</strong>이고, <strong>ResNet v2</strong>는 Batch Normalization이 먼저 들어가고 그다음 weight(conv) 레이어, 다시 BN → ReLU → weight 순서다(pre-activation). skip connection 네트워크에서 <strong>정규화를 먼저 하면 성능이 오른다</strong>는 내용이 발표됐다.</li>
+<li>이 결과가 먼저 <strong>Vision Transformer(ViT)</strong>에 적용됐다. ViT도 원래 정규화가 뒤에 있고 skip connection이 있는 구조였는데, 정규화를 앞으로 옮기니 똑같이 성능이 올랐다. 이후 디코더(GPT)에서도 같은 현상이 확인돼 지금처럼 정규화가 앞으로 넘어왔다.</li>
+</ul>
+<pre><code>ResNet v1 → ResNet v2 (정규화 먼저) → ViT에 적용 → GPT 디코더에 적용 (Pre-LN)
+</code></pre>
+<ul>
+<li>정규화가 하는 일("시끄러운 단어들의 데시벨 맞추기")은 <a class="xref" href="#ch-2">→ Transformer 블록 해부</a>.</li>
+</ul>
+<h3 id="ch-3-딥러닝-연구는-화학-실험처럼-모델을-굽는다">딥러닝 연구는 화학 실험처럼: "모델을 굽는다"</h3>
+<ul>
+<li>Pre-LN이 왜 잘 되는지는 논문을 봐도 정확히 나와 있지 않다. "데이터가 잘 정제돼서 학습을 더 잘한 것 같다" 정도로 추측한다.</li>
+<li>그래서 딥러닝을 깊이 공부할 때는 <strong>알고리즘, 자료구조처럼 접근하지 말고 물리, 화학 실험처럼</strong> 접근하는 것이 좋다. 먼저 "이렇게 학습시켜 봤더니 성능이 오른다"를 찾고 그 뒤에 분석한다. 구현법이 정해진 게 아니라 더 나은 화학식을 찾는 것처럼 실험해야 한다. "이전 실험이 이렇게 됐으니 여기에도 적용해 봤는데 이 모델도 똑같이 동작하더라"가 모델 발전의 흐름이고, 성능이 좋다는 건 확인되지만 왜 잘 되는지가 다시 연구 주제가 된다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> DL 모델 학습을 <strong>"모델을 굽는다"</strong>고 한다. 유래는 분명하지 않지만 GPU가 뜨거워서일 수도 있고, 더 큰 이유는 <strong>학습이 실패하는 경우가 많아서</strong>일 것이다. 파라미터를 통제해 학습시키고, 잘못되면 그 모델은 그냥 삭제한다. 도자기를 깨듯 버리고 가장 좋은 걸 골라 다음 실험으로 간다.</p>
+</aside>
+<ul>
+<li>ChatGPT 이전 딥러닝 연구는 대부분 이런 구조 연구였다. 지금도 카카오 <strong>Kanana</strong>, 네이버 <strong>CLOVA</strong>, 업스테이지 <strong>Solar</strong> 같은 모델을 만드는 일은 다 이런 구조 연구와 <strong>데이터 정제</strong>로 진행된다.</li>
+<li>직접 해 볼 수도 있다. 어텐션 레이어 튜닝은 <strong>PyTorch</strong>로 직접 구현해 <strong>Colab</strong>에서 <strong>1B 정도의 모델</strong>로 학습, 테스트까지 해 볼 수 있다. 예전에는 실험 구조를 짜는 게 힘들었지만 지금은 Claude Code, Codex로 모델링 코드가 금방 구현된다. 데이터 구성이 어렵긴 하지만, 아이디어로 기존 데이터를 학습하고 <strong>기존 벤치마크</strong>를 돌려 보는 식으로 튜닝을 직접 해 볼 수 있다.</li>
+</ul>
+<h3 id="ch-3-변화-2-포지셔널-인코딩에서-rope로">변화 2: 포지셔널 인코딩에서 RoPE로</h3>
+<ul>
+<li>현대 구조 그림에서는 토큰 임베딩 뒤 중간에 <strong>RoPE(Rotary Position Embedding, 회전을 이용한 위치 인코딩)</strong>가 들어간다. 지금 모델들은 이전 포지셔널 인코딩을 쓰지 않고 RoPE를 쓴다.</li>
+<li>어디에 적용되나: 기존 포지셔널 인코딩처럼 <strong>앞(임베딩 단계)이 아니라 뒤(어텐션)</strong>에서 적용된다. <strong>Key와 Query를 회전</strong>시켜, 두 벡터 사이의 관계(각도 비율)로 "얘네가 이만큼 같다", 즉 연관이 얼마나 있는지 찾아낸다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th></th>
+<th>기존 포지셔널 인코딩</th>
+<th>RoPE</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>넣는 곳</td>
+<td>임베딩에 더한다</td>
+<td>어텐션의 Query, Key에 적용</td>
+</tr>
+<tr>
+<td>방식</td>
+<td>상수값(주파수) 같은 것을 <strong>더함</strong></td>
+<td><strong>회전</strong>시킴</td>
+</tr>
+<tr>
+<td>위치 정보</td>
+<td><strong>절대 위치</strong> (강제로 더해지는 상수값)</td>
+<td><strong>상대 위치</strong></td>
+</tr>
+<tr>
+<td>"나는 학교에 갑니다"</td>
+<td>그냥 1, 2, 3으로 이어지는 번호</td>
+<td>"나는" 다음에 "학교에", "학교에" 다음에 "갑니다". "나는"과 "갑니다"가 <strong>두 칸 떨어져 있다</strong>는 정보를 공유한다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>보강하면, "나는"과 "학교"가 상대적으로 얼마나 떨어져 있는지, "학교에"에서 "나는"이 얼마나 떨어져 있는지 같은 <strong>상대적 거리 정보</strong>가 모이고, 이 정보로 어떤 단어를 얼마나 참고할지 결정한다. 단어들을 상대적으로 참조할 수 있게 하는 위치 인코딩이 어텐션에 직접 적용되면서 성능이 좋아졌다.</li>
+<li>상대 위치가 유리한 이유: 중요한 단어 하나를 찾았을 때 "거기서 한 칸, 두 칸 떨어진 것"을 기준으로 검색할 수 있다.</li>
+<li>배경 연구: RoPE가 갑자기 나온 건 아니다. 상대 위치를 계산하는 어텐션 기술(relative attention)이 먼저 있었다. <strong>RoFormer</strong> 논문에서 RoPE 적용 방식을 볼 수 있고, <strong>Music Transformer</strong> 논문도 어텐션에 위치가 절대적이 아니라 상대적으로 들어간다.</li>
+</ul>
+<h3 id="ch-3-변화-3-layernorm에서-rmsnorm으로">변화 3: LayerNorm에서 RMSNorm으로</h3>
+<ul>
+<li>정규화가 <strong>RMSNorm</strong>으로 바뀐다. RMSNorm은 (값의) 제곱을 이용한 정규화다. LayerNorm과 달리 평균을 빼지 않고 제곱평균제곱근(RMS)으로만 나눠 크기를 맞추므로 계산이 더 가볍다.</li>
+<li>역사: LayerNorm은 LSTM(RNN) 시절에 쓰던 상당히 오래된 기법이고, RMSNorm은 최근에 쓰는 것이다. 어텐션 계산을 돕는 정규화 기술은 여러 개가 있다.</li>
+<li>역할은 같다. 시끄러운 단어들의 데시벨을 맞춰 어텐션 계산을 쉽게 한다. 그래서 LayerNorm이든 RMSNorm이든 앞에서 한다. → <a class="xref" href="#ch-2">→ Transformer 블록 해부</a></li>
+</ul>
+<h3 id="ch-3-변화-4-어텐션-연산-비용-mqa-gqa-mla와-게이트">변화 4. 어텐션 연산 비용: MQA, GQA, MLA와 게이트</h3>
+<ul>
+<li>Explainer에서 입력의 어텐션은 6×6이었는데 토큰을 늘리니 12×12가 됐다. 토큰 수가 늘면 어텐션이 굉장히 커진다.</li>
+<li>어텐션은 두 데이터가 같이 와서 곱해지는 <strong>행렬곱</strong>이다. Transformer가 GPU로 가속된다고 해도 이 연산 딜레이가 상당하다. 그래서 사람들이 <strong>멀티헤드 어텐션(MHA)</strong>을 바꾸기 시작했다. 이 부분의 행렬 계산 비용이 매우 커서 최적화가 중요하다.</li>
+<li>대표 변형은 <strong>MQA, GQA, MLA</strong> 등이다. 모두 어텐션 행렬곱을 얼마나 잘(싸게) 계산하느냐의 문제다. 현대 구조 그림에는 <strong>Grouped-Query Attention</strong>이 나온다. MQA는 모든 헤드가 K, V 한 벌을 공유하고, GQA는 헤드를 그룹으로 묶어 그룹별로 K, V를 공유한다. MLA(DeepSeek-V2)는 K, V를 저차원 잠재 벡터로 압축해 KV 캐시를 줄인다.</li>
+<li>최적화 아이디어는 크게 세 가지다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>아이디어</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>나눠서 조금씩 계산</td>
+<td>행렬곱을 조금만 한다 (윈도우 방식)</td>
+</tr>
+<tr>
+<td>계산 결과 저장</td>
+<td>"이걸 다 기억해 놓는다" (KV 캐시 계열)</td>
+</tr>
+<tr>
+<td>압축, 선택</td>
+<td>조금 개선해서 일부 내용만 가져간다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>trade-off와 게이트</strong>: 압축률을 높이거나 계산을 빨리 할수록 전체 정보 손실(loss)이 생긴다. 예를 들어 조금씩 계산하는 방식은 윈도우를 움직이다 중간에 끊기는 부분이 생긴다. 그래서 <strong>value에 게이트를 달거나</strong>, value 외에 가지를 하나 더 만들어 <strong>시그모이드</strong> 같은 것을 달아 중요한 데이터만 출력하게 하는 작업을 많이 한다. 최근의 "gated attention" 계열이 이에 해당한다.</li>
+<li>딥시크 같은 모델이 기사에 나오는 것도 이 <strong>어텐션과 FFN/MoE 부분을 직접 손대서</strong> 바꾼 경우가 많다. 머신러닝 기법을 어텐션에 넣어 초반에 어텐션을 잘 못 잡는 문제를 개선하기도 하고, 구조를 개선해 새 구조를 만들기도 한다. 예를 들어 Skip-gram 모델을 어텐션에 붙여 초반 탐색 속도를 높이는 연구가 있다.</li>
+<li>전부 계산하면 오래 걸리니 <strong>일부만 계산해 찾는 방식</strong>이 있다는 정도만 알아도 된다.</li>
+</ul>
+<h3 id="ch-3-변화-5-mlp에서-moe로-라우터와-expert">변화 5. MLP에서 MoE로: 라우터와 expert</h3>
+<ul>
+<li>기존 트랜스포머/GPT는 MLP가 하나지만, LLM은 <strong>MoE(Mixture of Experts)</strong> 구조로 MLP가 여러 개 있다.</li>
+<li>구조: FFN은 입력이 들어와 안쪽 차원이 커졌다가 다시 원래대로 돌아오는데, 이 구조 하나를 <strong>하나의 Expert</strong>로 본다. MLP 크기만 한 Expert를 64개, 256개 등 여러 개 두고, 앞에 <strong>라우터(router)</strong>를 하나 단다. 라우터는 들어온 토큰을 "이거 가서 봐 봐, 이거 가서 봐 봐" 하고 <strong>가이드(분배)</strong>하고, 선택된 Expert들이 내놓은 정보를 <strong>더해서</strong> 다음으로 넘긴다.</li>
+</ul>
+<pre><code>              ┌→ Expert 1 (MLP) ─┐
+토큰 → 라우터 ─┼→ Expert 2 (MLP) ─┼→ 더해서 다음 블록으로
+              └→ Expert N (MLP) ─┘
+</code></pre>
+<ul>
+<li>예: 패턴을 보니 과학 관련 문장이면 과학 expert로, 수학이면 수학 전문가로, 영어, 번역이면 그 전문가로 보낸다. 하나의 모델이 아니라 전문가 모델들을 조합해 패턴을 잘 만들도록 쪼개 주는 것이다. 사람은 알 수 없지만 각 Expert가 "과목을 나눠" 알아서 학습할 것이다.</li>
+<li>레이어가 쌓이며 패턴이 누적되면 "수학에서는 이런 정보를 보면 다음 단어를 이렇게 만드는 경향이 있다" 같은 패턴이 생기고, 이를 출력한다.</li>
+<li><strong>LLM이 큰 이유</strong>: MLP 레이어가 여러 개라 데이터(패턴)가 하나가 아닌 여러 MLP에 저장되고, 이를 조합해 쓰기 때문이다. "전문가들의 집합이 답을 생성하므로 답을 잘 말할 수 있다."</li>
+<li>모델에 따라 Expert 수는 크게 늘어나기도 한다. 예를 들어 DeepSeek-V2의 routed expert는 160개다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout sum">
+<p><strong>정리</strong> 어텐션은 "어떤 컨텍스트가 중요한지"를, MoE는 "그 컨텍스트로 어떤 단어를 고를지"를 맡는다. 현대 LLM의 블록은 이 둘이 여러 층 쌓인 것이다.</p>
+</aside>
+<h3 id="ch-3-moe의-변형-shared-expert와-활성-파라미터">MoE의 변형: shared expert와 활성 파라미터</h3>
+<ul>
+<li><strong>두 연구 방향</strong>: MoE 연구와 MLP 연구 두 갈래가 있다. <strong>작은 모델은 MLP(dense)로, 큰 모델은 MoE로</strong> 간다.</li>
+<li><strong>shared expert</strong>: 딥시크에서 유명했던 MoE 방식은 Expert를 다 따로 만드는 게 아니라 <strong>무조건 들어가는 Expert</strong>를 두고 거기에 추가 지식 Expert를 더하는 구조다. DeepSeek는 MoE를 그대로 유지하지 않고 "작은 MoE"를 만들어 구조는 작게 하면서 전체 성능을 유지하는 연구 등을 했다.</li>
+<li>이런 구조는 연구한다면 생각해 내기가 아주 어렵지는 않지만 <strong>학습하려면 자원이 필요</strong>하다. 이런 구조를 생각해 테스트해 보면 그게 곧 "새 모델"이 된다.</li>
+<li><strong>활성 파라미터 표기</strong>: 모델 이름의 <strong>E2B, E4B</strong>나 <strong>A○B</strong> 표기는 이렇게 읽는다. MoE의 Expert가 31개 있는데 그중 4개만 활성화하면, 실제로는 31B 모델이 다 올라가야 하지만 <strong>4B만 활성화</strong>되는 식으로 쪼갠다. 일반적으로 "A4B"는 MoE의 활성 파라미터 4B를 뜻한다. 반면 Gemma 3n의 "E2B/E4B"는 effective 파라미터 표기로 MoE와는 다른 개념이다.</li>
+<li>면접 질문 예: "왜 MLP 레이어가 mixture(MoE)로 쓰이나?"</li>
+</ul>
+<h3 id="ch-3-모델-크기와-slm의-한계">모델 크기와 SLM의 한계</h3>
+<ul>
+<li>모델 크기는 <strong>데이터(패턴)를 담는 용량</strong>과 관련 있다. 그래서 SLM처럼 작은 모델은 학습한 전체 데이터 패턴을 인식하고 동작하는 데 한계가 있어 성능이 떨어질 수밖에 없다. MoE 구조 때문에 LLM 크기는 굉장히 커진다.</li>
+<li>SLM은 구조상 컨텍스트 유지 능력도 많이 떨어진다. 128K 롱 컨텍스트 벤치마크에서 작은 모델은 약 1.5만 토큰 정도만 인식했다. 수치 표는 <a class="xref" href="#ch-2">→ Transformer 블록 해부</a>.</li>
+<li>MoE 구조 때문에 파인튜닝만으로 데이터를 주입하기도 매우 어렵다. → <a class="xref" href="#ch-4">→ 모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</a></li>
+</ul>
+<h3 id="ch-3-사례-업스테이지-solar-신모델-구조">사례: 업스테이지 Solar 신모델 구조</h3>
+<ul>
+<li>독자 AI 파운데이션 모델 프로젝트("독파모")에서 공개된 업스테이지 Solar 신모델의 발표 자료를 보면, 총 파라미터는 <strong>250B(2,500억) 안팎</strong> 규모이고 실제로 동작하는(활성) 파라미터는 그중 일부(15B 안팎)다.</li>
+<li>발표 그림의 구조:</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>부위</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>어텐션</td>
+<td><strong>하이브리드</strong>. softmax attention(원래 어텐션의 변형, sigmoid gate 포함) + MoE 블록과, <strong>linear attention</strong>(softmax 스코어링을 하지 않는 형태) + MoE 블록이 섞여 있다</td>
+</tr>
+<tr>
+<td>softmax attention 내부</td>
+<td>Key, Query, Value로 dot product를 하고, linear 레이어를 하나 더 둬 <strong>sigmoid gate</strong>를 만든다. sigmoid를 취하면 0~1 값이 되므로 필요 없는 것은 0, 중요한 것은 1 쪽으로 걸러 낸다</td>
+</tr>
+<tr>
+<td>기타</td>
+<td>normalization 항, mask, <strong>GQA</strong>, feed-forward(MoE). 앞의 모델 구조 비교 그림과 비슷하다</td>
+</tr>
+<tr>
+<td>MoE</td>
+<td>라우터가 <strong>320개 expert</strong>를 조정하고, 항상 동작하는 <strong>shared expert</strong>가 하나 있다</td>
+</tr>
+<tr>
+<td>위치 인코딩</td>
+<td>원래는 RoPE를 쓰지만, 컨텍스트를 더 길게 보기 위해 RoPE를 버리고 <strong>NoPE</strong>(No Positional Encoding)를 썼다. 관련 논문에 NoPE 설명이 나올 것이다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>sigmoid gate는 원래 <strong>LSTM의 게이트 구조</strong>를 가져온 것이다. 임베딩은 학습하며 값이 계속 바뀌는데, 게이트로 중요한 것만 걸러 내는 방식을 최근 많이 쓴다.</li>
+<li>교훈: RAG처럼 모델 구조도 다른 분야(LSTM)의 아이디어를 가져와 붙이는 식으로 개선된다. 기본 구조를 알고 보면 "어떤 문제를 풀려고 무엇을 바꿨는지"가 보인다.</li>
+<li>발표는 앞쪽이 벤치마크, 모델링, 뒤쪽이 활용(홈페이지, LMS 연동 등)이다. 사전학습보다 <strong>사후 학습(post-training)</strong> 이야기가 더 많고, 한국어 기반 모델이라 한국어를 잘한다는 이야기도 나온다. 사후 학습은 <a class="xref" href="#ch-4">→ 모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</a>.</li>
+</ul>
+<h3 id="ch-3-새-모델-논문을-따라가는-법">새 모델, 논문을 따라가는 법</h3>
+<ul>
+<li>새로 공개되는 SLM이나 논문, 기술 발표는 거의 다 <strong>이 기본 구조 안에서 무엇을 바꿨는지</strong>로 설명한다. 임베딩을 어떻게 했는지, 어텐션을 어떤 변형(멀티헤드 어텐션의 여러 변형)으로 만들고 어떤 계산을 추가했는지, MLP를 어떻게 효율화했는지, 작은 모델 여러 개를 학습시켜 가져왔는지 등이다.</li>
+<li>RAG 논문이 "입력을 정제해 검색을 더 잘하게 했다"를 설명하듯, 모델 논문은 "원래 이렇게 동작하던 것을 이렇게 변형했다"를 설명한다.</li>
+<li>기준 구조(임베딩 → RoPE → 어텐션 → MoE, 중간중간 정규화)를 부위별 질문으로 바꾸면 다음과 같다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>부위</th>
+<th>논문, 발표에서 확인할 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>위치 정보</td>
+<td>포지셔널 인코딩 / RoPE / NoPE 중 무엇인가</td>
+</tr>
+<tr>
+<td>정규화</td>
+<td>어디에(앞, 뒤) 무엇으로(LayerNorm, RMSNorm) 넣었나</td>
+</tr>
+<tr>
+<td>어텐션</td>
+<td>MHA / GQA / MQA / MLA / linear / 게이트 중 무엇을 썼나</td>
+</tr>
+<tr>
+<td>MLP</td>
+<td>dense인가 MoE인가. expert 수, shared expert, 활성 파라미터</td>
+</tr>
+<tr>
+<td>학습</td>
+<td>사전학습, 사후 학습에서 무엇을 했나 (<a class="xref" href="#ch-4">→ 모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</a>)</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>나중에 더 중요한 부분은 어텐션 파트와 MoE 구조의 문제점 등이다. 이것만 조금 체크하면 구조가 바뀌는 건 어렵지 않게 인식할 수 있다. 이런 연구를 하는 회사도 꽤 있다.</li>
+</ul>
+<h3 id="ch-3-혁신-구조는-아직-없다-그리고-패러다임-전환">혁신 구조는 아직 없다, 그리고 패러다임 전환</h3>
+<ul>
+<li>딥러닝 역사에서는 ResNet처럼 계단식으로 도약하는 모델이 하나씩 나왔다. 2012년 무렵 CNN이 한창 발전할 때는 성능이 크게 뛰는 새 구조가 계속 나와 모두가 새 구조를 다시 공부했다.</li>
+<li>하지만 2017년 Transformer, 이후 GPT가 나온 뒤로는 <strong>아직 그 벽을 넘는 혁신 모델이 없다.</strong> 지금은 GPT 구조를 조금씩 튜닝하는 형식이라, 여기까지 공부해 두면 새 구조가 나오기 전까지는 다 그 안에서 움직인다. "LLM 모델 구조는 딱 거기까지 진행하면 완료"이고, 한 번만 정리해 두면 트래킹이 가능하다.</li>
+<li>패러다임이 바뀔 가능성도 있다. 딥러닝에서는 "GAN보다 좋은 게 나올까" 하다가 <strong>디퓨전 모델</strong>이 나오자 GAN이 싹 사라졌고, GAN을 열심히 공부하던 사람들은 처음부터 다시 공부했다. 임베딩, RoPE, 어텐션, MoE를 쓰지 않는 다른 형태의 모델이 LLM 벤치마크를 월등히 앞선다면 그때가 패러다임이 바뀌는 시기이고, 그 모델을 공부할 때다.</li>
+<li>구글에 대한 한 가지 해석: Gemini는 멀티모달 모델이라 특이한 경우이고, 구글은 튜닝을 "극강으로" 잘하면서도 특이한 시도를 많이 한다. 트랜스포머처럼 <strong>새로운 모델 구조</strong>를 만드는 데 강하므로 트랜스포머를 뛰어넘는 모델에 집중하고 있을 것이다. 사람들이 "Gemini 성능이 안 좋다"고 해도, 구글은 LLM보다 <strong>프런티어 연구</strong>에 더 집중하는 것 같고, Claude 같은 곳은 LLM으로 상품을 만든다는 해석이다.</li>
+</ul>
+<h3 id="ch-3-트랜스포머-너머-월드-모델-피지컬-ai-연속-학습">트랜스포머 너머: 월드 모델, 피지컬 AI, 연속 학습</h3>
+<p>최근 연구 동향이다. 다른 분야보다 굉장히 빠르게 변하니 계속 확인하는 것이 좋다.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>방향</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>강화학습 기반 학습</td>
+<td>지금 가장 각광받는 학습 방법(Agentic RL 등). 엄밀히는 "LLM 이후"라기보다 LLM을 강화학습으로 발전시키는 것이고, 커스텀 토큰을 쓰는 부분과 연결된다 (<a class="xref" href="#ch-4">→ 모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</a>)</td>
+</tr>
+<tr>
+<td>피지컬 AI</td>
+<td>LLM을 두뇌로 보면, 지금은 툴과 프롬프트로 구현했지만 툴에 로봇이 붙거나 LLM이 커스텀 토큰으로 "팔을 몇 도 구부려라" 같은 <strong>로봇 제어 토큰</strong>을 생성하게 학습시킬 수 있다. 안경을 배포해 작업자 손 영상을 수집하는 스타트업도 있다</td>
+</tr>
+<tr>
+<td>월드 모델</td>
+<td>LLM이 다음 단어를 예측한다면, 월드 모델은 이미지, 오디오 위주로 <strong>물리 세계 자체를 인식</strong>하도록 학습한다. CNN을 만든 얀 르쿤이 메타를 나와 차린 랩, DeepMind의 Genie 등. 아직 연구 단계</td>
+</tr>
+<tr>
+<td>ASI(초지능)</td>
+<td>사람 수준(AGI)을 목표로 한 기존 LLM과 달리 사람 지능을 훨씬 뛰어넘는 모델. 구글이 연구 중</td>
+</tr>
+<tr>
+<td>연속 학습(Continual Learning)</td>
+<td>구글의 Nested Learning처럼 여러 주기로 갱신되는 메모리로 언어 모델이 실시간으로 계속 학습하게 하는 연구. Anthropic도 연구 중일 것으로 보인다</td>
+</tr>
+<tr>
+<td>자가 학습(Self-Evolving Agent)</td>
+<td>SF 영화 속 AI처럼 스스로 데이터를 찾아 진화하는 모듈 연구</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>월드 모델의 논리: 사람은 시각, 청각 위주로 학습하므로(촉각은 데이터화가 어렵다) 텍스트로 학습한 LLM은 사람과 맞지 않다는 것이다. Gemini도 멀티모달로 학습했지만 LLM 기준이라 텍스트가 메인이었다. 트랜스포머가 RNN의 규칙을 다시 정의했듯 완전히 새로운 형식이라, 나오면 지금 쓰는 "문법"이 크게 바뀔 수 있다. "더 사람 같아지면 사람과 같은 실수도 하지 않겠냐"는 논란도 있다(레딧).</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>예시</strong> <strong>휴머노이드 손가락이 5개인 이유</strong>: 사람 손(대부분 5개)을 보고 학습하므로 손가락이 5개가 아니면 학습에 문제가 생길 수 있다. 3개로 만들면 비용은 크게 줄겠지만, 사람을 학습해야 하니 사람 형태를 모방해야 하는 제약이 생긴다.</p>
+</aside></div></section>
+<section class="chapter" id="ch-4"><header class="ch-head"><div class="ch-no">주제 4</div><h2>모델 학습: 사전학습, SFT, 강화학습, 파인튜닝</h2><p class="lede">사전학습 → SFT → 강화학습으로 이어지는 학습 단계와, 그 모든 단계가 결국 &quot;한 줄로 이어진 토큰 열에서 다음 토큰 맞히기&quot;라는 점을 정리한다. 채팅, 툴콜, thinking 형식을 만드는 커스텀 토큰, 양자화와 LoRA, QLoRA, 증류, 파인튜닝 실패 증상, 데이터 준비까지 담았다.</p></header><div class="prose"><h3 id="ch-4-모델을-원하는-대로-움직이는-두-길">모델을 원하는 대로 움직이는 두 길</h3>
+<ul>
+<li>모델이 원하는 동작을 하게 만드는 길은 두 가지다. 하나는 <strong>모델 파라미터를 업데이트</strong>하는 것(파인튜닝, 강화학습 기반 파인튜닝)이고, 다른 하나는 <strong>코드로 외부 데이터를 관리</strong>하는 것이다. 이 과정은 후자, 특히 툴에 집중한다. → <a class="xref" href="agentic-ai-1-agent-basics.html#ch-2">→ Tool과 Function Calling</a></li>
+<li>모델이 너무 커서 학습 시간, 비용이 많이 들어 최신 데이터를 매번 학습시키기 어렵다. 학습 대신 프롬프트로 넣어 주는 RAG가 나온 이유다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-3">→ RAG: 임베딩 검색과 ChromaDB</a></li>
+<li>그래도 모델 쪽을 알아야 하는 이유: 회사에 들어가면 "이 모델을 만들 건데 파인튜닝 데이터셋을 구성해 봐라", "파인튜닝 준비를 해 봐라"는 요청이 떨어질 가능성이 꽤 많다. 요즘은 SLM을 직접 학습하는 경우가 많기 때문이다. 현업에서는 SLM을 정답이 있는 데이터로 파인튜닝하고, 요즘은 강화학습까지 해야 하는 상황이다.</li>
+<li>모델 구조와 데이터가 어떻게 넘어가는지 알면 파인튜닝, 디스틸레이션을 할 때도, 컨텍스트를 관리할 때도 도움이 된다.</li>
+<li>다만 직접 딥러닝 모델을 학습해 본 적 없는 사람에게 파인튜닝을 권하지는 않는다. "파인튜닝을 준비한다면 무엇을 해야 하나"를 알아 두자는 취지로, 직접 실습하지 않고 흐름만 소개한다.</li>
+</ul>
+<h3 id="ch-4-학습-단계-한눈에-사전학습-sft-강화학습">학습 단계 한눈에: 사전학습 → SFT → 강화학습</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>단계</th>
+<th>시작점</th>
+<th>데이터</th>
+<th>결과</th>
+<th>누가, 어떻게</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>사전학습(pre-training)</td>
+<td>처음부터</td>
+<td>대량의 텍스트로 다음 단어 예측</td>
+<td><strong>Base 모델</strong>. 문장만 만든다</td>
+<td>모델 개발 회사. 전체 파라미터를 학습해 데이터, 시간이 매우 많이 든다</td>
+</tr>
+<tr>
+<td>SFT(Supervised Fine-Tuning)</td>
+<td>사전학습이 끝난 모델</td>
+<td>정답이 있는 데이터(Q&amp;A, 풀이 과정)</td>
+<td>형식, 기능을 익힌 모델. 챗봇형이면 <strong>Instruct 모델</strong></td>
+<td>전체 파라미터 튜닝은 모델 회사, 활용 쪽 회사는 대부분 QLoRA</td>
+</tr>
+<tr>
+<td>강화학습(RL)</td>
+<td>SFT를 거친 모델</td>
+<td>SFT의 Q&amp;A + 보상(평가) 함수</td>
+<td>베스트 답을 더 잘 고르는 모델, thinking 강화</td>
+<td>PPO, GRPO 등. 상위 모델이 평가</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>파인튜닝은 <strong>SFT</strong>와 <strong>강화학습을 이용한 튜닝</strong>의 두 단계로 진행된다. 실제 데이터를 모두 가지고 정리했을 때 진행한다.</li>
+<li>모델은 이런 과정을 거쳐 계속 학습된다. 예전에는 강화학습을 직접 구현해야 했지만 지금은 툴, 프레임워크도 나오고 있다.</li>
+</ul>
+<h3 id="ch-4-사전학습-다음-단어-예측과-새벽에-터진-학습">사전학습: 다음 단어 예측과 "새벽에 터진 학습"</h3>
+<ul>
+<li>GPT 학습 그림을 보면 <strong>다음 단어를 예측</strong>하도록 되어 있다. 지금 쓰는 모든 GPT 모델이 이렇게 학습한다.</li>
+<li>사전학습은 <strong>전체 파라미터</strong>를 학습하므로 데이터와 시간이 매우 많이 든다. 임베딩 가중치도 이때 함께 학습된다. 역전파가 임베딩까지 내려오기 때문이다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>예시</strong> 현업에서는 대형 모델을 학습시킬 때 Slack에 연동해 두는데, 새벽에 학습이 터졌다는 메시지가 아침에 잔뜩 쌓여 있으면 "끔찍하다". 게이밍용 GPU를 쓰면 연구용 메모리 관리 기능이 약해 memory allocation 오류로 학습이 멈추고 처음부터 다시 돌려야 한다. 2주 돌리다 끊기고 다시 돌리기를 반복하면 시간이 매우 오래 걸린다.</p>
+</aside>
+<ul>
+<li>학습 데이터 정제: LLM, SLM 학습 때 문장이 중간에 잘린 데이터는 조건이 손상된 채 넘어가 점수가 떨어지므로 정제하는 경우가 많다.</li>
+<li>학습이 실패하는 경우가 많아 "모델을 굽는다"고 한다. → <a class="xref" href="#ch-3">→ GPT-2에서 현대 LLM으로</a></li>
+</ul>
+<h3 id="ch-4-base-모델과-instruct-모델-gpt는-원래-채팅-모델이-아니다">Base 모델과 Instruct 모델: GPT는 원래 채팅 모델이 아니다</h3>
+<ul>
+<li>GPT는 챗봇이 아니라 <strong>문장을 그대로 이어 만드는 언어 생성 모델</strong>이다. 챗봇으로 쓰려고 커스텀 토큰을 이용해 <strong>마치 턴 형식으로 대화하는 듯한 문장</strong>을 만들도록 따로 구성한 것이다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th></th>
+<th>Base 모델</th>
+<th>Instruct(Instruction) 모델</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>학습</td>
+<td>사전학습(pretrained)만 끝났다</td>
+<td>챗봇 형태로 파인튜닝까지 끝났다</td>
+</tr>
+<tr>
+<td>할 수 있는 것</td>
+<td>문장만 만든다. 단어를 넣으면 문법 오류 없이 완성하는 동작만 한다. 챗봇이 아니다</td>
+<td>user, system prompt, assistant 같은 <strong>커스텀 토큰이 추가된 상태</strong>에서 "유저가 질문하고 모델이 답하는" <strong>출력 구조를 학습</strong>했다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>우리가 쓰는 챗봇 모델이 바로 이렇게 파인튜닝된 모델이다. 그래서 내 의도대로 파인튜닝하거나 용어를 학습시키는 일은 텍스트 자체를 학습시킨다기보다 <strong>커스텀 토큰을 추가해 구조를 다시 학습</strong>시키는 것에 가깝다.</li>
+</ul>
+<h3 id="ch-4-커스텀-토큰-vocab에-새-단어를-추가한다">커스텀 토큰: Vocab에 새 단어를 추가한다</h3>
+<ul>
+<li>Vocab은 데이터셋을 잘라 집합(set)으로 만든 원본 상태에서 시작하고, 여기에 <strong>커스텀 토큰을 추가</strong>한다. 파인튜닝에서 가장 중요한 부분이다. 회사의 자체 SLM을 업무에 맞춰 파인튜닝하거나 로봇을 동작시키는 언어를 학습시킬 때는 <strong>항상 커스텀 토큰을 활용</strong>한다.</li>
+<li>가장 유명한 커스텀 토큰은 <strong>BOS</strong>(Begin of Sentence)와 <strong>EOS</strong>(End of Sentence)다. 쌍으로 쓰며 NLP 모델들이 거의 공통으로 쓴다. 추론 중 EOS가 나오면 생성 루프(for문, while문)를 끝내고 문장을 반환한다.</li>
+<li>"모델은 단어만 만드는데 대체 어떻게 기능을 동작시키지?"의 답: 모델이 실제로 만드는 것은 <strong>토큰 ID</strong>이고 토크나이저가 이를 단어로 바꾼다. 그래서 <strong>나오는 토큰을 보고 원하는 동작, 기능을 실행</strong>하도록 구현할 수 있다.</li>
+<li>커스텀 토큰이 대화 속에서 규칙을 만든다. 예: "이 시점에서 유저 대화가 끝나면 어시스턴트가 답을 시작한다."</li>
+<li>커스텀 토큰을 <strong>언제, 어떻게 쓰는지는 우리가 준비한 데이터셋이 가르친다.</strong> 맥락이 담긴 입력을 줘야 동작한다.</li>
+</ul>
+<h4 id="ch-4-로봇-예시-walk-토큰-만들기">로봇 예시: <code>walk</code> 토큰 만들기</h4>
+<ul>
+<li>상황: 로봇의 상황 판단 액션(피지컬 AI). 로봇에는 시각, 툴, 움직임이 있고, 실제 움직임은 보통 강화학습 모델 등과 연동한다. 길이 있어서 로봇이 걸어가야 하는 상황이면 "앞으로 걸어가야 한다" → 액션 툴 중 <code>walk</code>를 실행한다.</li>
+<li>툴콜로 할 수도 있지만, <strong>파인튜닝하면 툴콜 없이</strong> 모델이 자체 커스텀 토큰을 예측하고 그 토큰에 해당하는 코드(로봇을 걷게 하는 코드)를 바로 실행시킬 수 있다. 모델이 그 토큰을 예측했다는 것이 곧 "지금은 걸어야 한다"는 판단이다.</li>
+<li>구현: 토크나이저 Vocab에 <code>action</code>, <code>walk</code>, <code>run</code> 같은 커스텀 토큰을 넣는다. ID는 기존 Vocab <strong>뒤에 붙여서</strong> 예를 들어 500번, 501번을 준다. 이렇게 하면 학습 준비가 끝난다.</li>
+<li>데이터: 유저 메시지 "집으로 돌아가" + 이미지(길이 보이고 끝에 집이 있다. 영상이면 집으로 가는 이미지가 연속으로 들어간다) → 로봇이 집을 보고 <code>walk</code>를 실행. 이렇게 구성하면 "이런 맥락에서는 저기로 걸어가는 커스텀 토큰이 실행된다"는 데이터가 만들어진다.</li>
+<li>토크나이저를 거치면 이 데이터가 다음처럼 한 줄의 토큰 열이 된다.</li>
+</ul>
+<pre><code>&lt;BOS&gt; &lt;user&gt; 집으로 돌아가 &lt;image&gt; [base64 이미지] &lt;/image&gt; &lt;robot&gt; &lt;walk&gt; &lt;EOS&gt;
+</code></pre>
+<ul>
+<li>학습은 사전학습과 똑같이 다음 토큰 맞히기다. BOS가 들어가면 다음 토큰 <code>user</code>를 예측하고, 유저 발화, 이미지, <code>robot</code>, <code>walk</code>… 순으로 다음 토큰을 맞혀 간다. <code>robot</code> 시작 토큰이 나오면 유저 턴이 끝난 것이므로 <strong>user 끝 토큰을 생략해 토큰을 아낀다.</strong> EOS가 나오면 어차피 끝난다.</li>
+<li>토큰화하고 임베딩으로 연결하는 이유는 "집으로 가"라고 하면 <code>walk</code>가 <strong>예측되게</strong> 하려는 것이다. 임베딩 공간에서 <code>walk</code>는 "데이터", "로봇" 같은 단어와 함께 768차원 공간의 점으로 놓인다.</li>
+</ul>
+<h3 id="ch-4-채팅-형식-한-줄로-이어진-토큰-열">채팅 형식: 한 줄로 이어진 토큰 열</h3>
+<ul>
+<li>파인튜닝 데이터셋을 찾아보면 대부분 <strong>user / assistant(인스트럭션) 형식</strong>이라 "이건 어떻게 학습하지? 뭘 준비해야 하지?" 하고 헷갈린다. 답: <strong>사전학습과 똑같이 다음 토큰 예측으로 학습한다.</strong> 사람이 보는 데이터(JSON)는 <strong>토크나이저</strong>를 거쳐 모델에 들어가는 토큰 형태로 바뀐다. 원래는 이 변환을 직접 구현해야 했지만, 지금은 토크나이저에 넣으면 변환해 준다. 파인튜닝 데이터셋이 학습될 때 한 번 "번역"되는 과정이 바로 이 변환이다.</li>
+<li>채팅 데이터가 실제로 모델에 들어가는 모양은 다음과 같다.</li>
+</ul>
+<pre><code>&lt;BOS&gt; &lt;user_start&gt; 대화 내용 ... &lt;assistant&gt; 대화 내용 ... &lt;EOS&gt;
+</code></pre>
+<ul>
+<li>토큰을 아끼기 위해 end 토큰(예: user_end)은 안 쓰는 경우가 많다. 이렇게 하나씩 나뉜 토큰이 <strong>실제로 모델이 생성하는 토큰</strong>이고, 모델 입장에서는 전부 숫자(토큰 ID)다.</li>
+<li>우리 눈에는 유저 질문과 어시스턴트 답이 각각의 정보 블록처럼 보이지만, 실제로는 <strong>문장 시작 → user 토큰 → 유저 내용 → assistant 토큰 → 답변</strong>처럼 이어지는 <strong>하나의 토큰 열</strong>이다. 커스텀 토큰 하나가 지정되면 그 토큰으로 유저 발화와 모델 발화를 구분한다.</li>
+<li>핵심: GPT 모델 자체는 <strong>항상 다음 토큰 하나</strong>를 예측한다. tool call이나 user/assistant 질의응답 구조도 GPT가 "아는" 게 아니다. 토큰을 만들어 놓고 <strong>뒤에서 후처리(포스트 프로세싱)로 그 토큰들을 캐치해 채팅처럼 보이게</strong> 만든다. 그래서 원래는 <strong>모든 컨텍스트가 일자로(한 줄로) 들어가 다음 단어를 예측하는 흐름</strong>이라고 생각해야 한다. "이게 입력으로 다시 들어가고 저게 출력으로 나와야 할 것 같은데" 하고 생각하는 순간 복잡해진다.</li>
+<li>출력할 때 유저 토큰이 있는 부분은 유저 발화로, 어시스턴트 토큰이 있는 부분은 답변으로 <strong>파싱</strong>하면 챗봇처럼 동작하는 모델이 된다. 매 단어 생성 때 이 커스텀 토큰들까지 포함한 전체가 다시 들어간다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout tip">
+<p><strong>팁</strong> 이렇게 보면 어떤 모델이 무엇을 학습했다, 어떤 데이터셋으로 파인튜닝했다고 해도 <strong>커스텀 토큰과 구조만 보면 "대충 이렇게 학습했구나"</strong>를 알 수 있다. 모델을 응용해 만들고 싶을 때도 대부분 커스텀 토큰으로 작업한다.</p>
+</aside>
+<h3 id="ch-4-툴콜-형식-툴콜도-커스텀-토큰이다">툴콜 형식: 툴콜도 커스텀 토큰이다</h3>
+<ul>
+<li>Function Call도 같은 구조다. 질문이 있으면 tool에 어떤 입력을 하고, tool 메시지(결과)가 오면 이를 기준으로 다시 답변을 생성한다. tool 이름, 입력 변수 등이 tool 토큰 안에 들어간다. 툴 결과를 이런 토큰 구조에 담아 주면 모델이 툴 결과를 받고 어시스턴트가 답변하는 형태로 학습된다.</li>
+<li>툴콜은 모델이 <strong>학습한 능력</strong>이라 지원하는 모델만 에이전트로 쓸 수 있다. Gemini, Claude 같은 LLM은 대부분 지원하지만 SLM 중에는 지원하지 않는 모델이 있다. → <a class="xref" href="agentic-ai-1-agent-basics.html#ch-2">→ Tool과 Function Calling</a></li>
+<li>그래서 <strong>툴콜이 안 돼서 에이전트로 못 쓰는 모델</strong>도 툴콜 데이터셋으로 파인튜닝하면 툴콜이 학습돼 에이전트로 쓸 수 있다. 파인튜닝은 "출력 형식을 넣는 법"이기 때문이다. 다만 처음 모델링할 때부터 학습한 모델과는 차이가 날 수 있다.</li>
+<li>모델 입장에서 툴콜은 <strong>커스텀 토큰으로 불리는 형식</strong>으로 동작한다. MCP는 이 툴콜을 잘 부를 수 있게 툴 정보를 공급하는 프로토콜일 뿐이다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-4">→ MCP와 A2A</a></li>
+<li>평가와의 연결: 툴 트레이스는 툴 내용이 툴용 커스텀 토큰에 감싸여 들어가므로, BERTScore처럼 임베딩 유사도로 비교하면 모든 툴 호출이 비슷해 보여 같은 툴인지 구분하지 못한다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-6">→ 에이전트 평가와 LLM-as-a-judge</a></li>
+<li>구조화된 출력에서 ProviderStrategy가 파싱을 잘하는 것도 모델 제공사가 구조화된 출력에 대해 파인튜닝을 한 것으로 보인다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-1">→ 구조화된 출력과 Pydantic</a></li>
+</ul>
+<h3 id="ch-4-thinking-형식과-effort-레벨">thinking 형식과 effort 레벨</h3>
+<ul>
+<li>맨 처음 배운 <strong>CoT 프롬프트가 thinking으로 확장</strong>됐고, 여기에 <strong>강화학습</strong>이 들어간다. CoT는 "thinking 모델로 나가는 최초 연구 중 하나"이고, 그 연구가 이어져 지금의 thinking, reasoning 모델에 적용됐다. → <a class="xref" href="agentic-ai-1-agent-basics.html#ch-3">→ 프롬프트 엔지니어링</a></li>
+<li>이를 따로 다루는 이유: 사람이 말하고 모델이 말하는 대화와 "생각을 계속한다"는 것이 어떻게 분리돼 진행되는지가 헷갈리기 때문이다. 실제 데이터셋을 보면 모델이 말하고, 사람이 말하고, thinking을 쭉 하는데 "이걸 어떻게 강화학습하지?" 싶다.</li>
+<li>thinking 모델의 시퀀스는 "여기서부터 여기까지 생각하고, 답변을 진행하고, 답변을 종료한다"는 형식이다.</li>
+</ul>
+<pre><code>&lt;think&gt; ...여기서부터 여기까지 생각한다... &lt;/think&gt; &lt;answer&gt; ...답변... &lt;/answer&gt; &lt;EOS&gt;
+</code></pre>
+<ul>
+<li><strong>effort 레벨의 정체</strong>: thinking을 여러 번 할 수도 있다. 모델 옵션의 <strong>medium, high, xhigh</strong> 같은 단계는 <strong>thinking 토큰이 몇 번 예측되는지 카운팅해 제약을 거는 것</strong>으로 만들 수 있다. 예를 들어 10번, 5번, 3번까지 제약을 걸면 thinking/answer 쌍이 그만큼 생성된 뒤 끝난다. "ultra" 같은 단계면 제약이 100번이지만 다 도는 게 아니라 <strong>중간에 EOS를 예측하면 생성을 중단</strong>한다. effort를 고르는 실무 기준은 <a class="xref" href="agentic-ai-4-tools-practice.html#ch-1">→ 모델 고르기와 여러 모델 조합</a>.</li>
+<li><strong>think 안에서 tool call</strong>: 초기에는 <code>&lt;think&gt;</code> → <code>&lt;answer&gt;</code> 구조였다. 최근에는 think 안에서 tool도 부르고, tool이 끝나면 생각이 끝나고 다음으로 진행하는 구조도 있다. 원래 프레임워크의 펑션콜 기능으로 하던 것을 <strong>모델 자체에 파인튜닝으로 구현</strong>한 것이다.<ul>
+<li>웹 서비스에서 "검색해 줘"라고 하면 바로 thinking하며 검색하는 것: 파인튜닝으로 특정 토큰을 예측하게 해 두고, 그 토큰이 예측되면 <strong>코드가 실제로 검색 툴을 불러 결과를 컨텍스트에 붙이고 계속 진행</strong>한다.</li>
+<li>단점: 파인튜닝 때 쓴 검색, 요약 같은 <strong>한정된 툴만</strong> 모델이 네이티브로 부를 수 있다.</li>
+</ul>
+</li>
+<li>커스텀 토큰을 Vocab에 추가해 파인튜닝하면 모델이 커스텀 토큰이 어디에 들어가는지 학습한다. thinking도 마찬가지다. 다만 학습하려는 모델에 <strong>이미 thinking이 학습돼 있다면</strong> 그 커스텀 토큰이 이미 포함돼 있으니 따로 추가하지 않아도 된다.</li>
+<li>no-thinking 모델도 에이전트로 쓰면 <strong>ReAct 프롬프트</strong>가 동작해 thinking과 비슷하게 동작하므로 어느 정도 쓸 수 있다. → <a class="xref" href="agentic-ai-1-agent-basics.html#ch-1">→ 에이전트란 무엇인가</a></li>
+<li>골프공 문제("45인승 버스에 골프공을 넣으면 몇 개 들어갈까")도 thinking 모델이면 사람이 단계를 나눠 주는 것보다 더 잘 풀 수 있다. 일반 답변 모델이라면 "부피 먼저 계산 → 골프공 넣는 방식 → 기물 부피, 공 겹침 처리"처럼 순서를 줘야 한다.</li>
+</ul>
+<h3 id="ch-4-커스텀-토큰-응용-위키-저장-음악-과학-로봇">커스텀 토큰 응용: 위키 저장, 음악, 과학, 로봇</h3>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>분야</th>
+<th>커스텀 토큰</th>
+<th>동작</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>위키 자동 저장</td>
+<td>"위키 토큰"</td>
+<td>유저가 만족할 만한 대화가 나오면 내용을 요약해 저장하도록 학습한다. 생성 결과에서 위키 토큰을 캐치해 "저장"을 실행한다</td>
+</tr>
+<tr>
+<td>음악 생성</td>
+<td>음표, 코드(chord). 예: <code>C major</code>, <code>Cmaj7</code></td>
+<td>생성된 토큰을 MIDI로 변환하기만 하면 심볼릭 음악 생성이 된다</td>
+</tr>
+<tr>
+<td>과학</td>
+<td>단백질 구조, 화학식에 필요한 토큰</td>
+<td>"AI로 단백질 구조나 화학식을 학습시켰다"는 사례 대부분이 이 방식이다</td>
+</tr>
+<tr>
+<td>로봇(피지컬 AI)</td>
+<td><code>walk</code>, <code>run</code>, "팔을 몇 도 구부려라" 같은 제어 토큰</td>
+<td>토큰이 예측되면 로봇 제어 코드를 실행한다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>지금 우리가 쓰는 기능 대부분이 <strong>커스텀 토큰 기반</strong>으로 동작한다.</li>
+<li>이렇게 학습한 모델을 Claude Code 같은 에이전트의 백엔드 모델로 교체해 쓰기도 한다. 커스텀 토큰이 예측됐을 때 동작하는 툴, 기능을 만들어 두면 <strong>토큰 예측 → 파싱 → 함수 실행</strong>까지 다 이어져 직접 에이전트로 쓸 수 있다.</li>
+</ul>
+<h3 id="ch-4-파인튜닝은-결과의-형식을-가르친다-잘-되는-것과-어려운-것">파인튜닝은 "결과의 형식"을 가르친다: 잘 되는 것과 어려운 것</h3>
+<ul>
+<li>파인튜닝 자료에 자주 나오는 말: <strong>"결과의 형식을 학습시키는 데 강력하다."</strong> 파인튜닝을 한다는 건 거의 이 형식 학습을 하는 것과 비슷하다. 문장을 새로 만들어 준다기보다 "이런 얘기가 끝났을 때 다음은 어시스턴트가 말할 것 같아 → 그 토큰을 넣는다", "문장이 시작하면 바로 시스템 프롬프트가 오고, 그다음 유저가 말할 것 같아 → 그 토큰을 넣는다"는 <strong>형식을 넣어 주는 것</strong>이다. 대표 예가 <strong>챗봇, tool call, thinking 모델</strong>이다.</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>잘 되는 것</th>
+<th>어려운 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>커스텀 토큰으로 원하는 기능을 끼워 넣거나 동작시키기</td>
+<td><strong>지식 주입</strong>. 텍스트가 생성되는 패턴 자체를 바꾸기</td>
+</tr>
+<tr>
+<td>대화 구조(user/assistant), 툴콜, thinking 같은 출력 형식</td>
+<td>"이런 문장을 만들어 냈으면 좋겠다" 같은 학습</td>
+</tr>
+<tr>
+<td>간단한 용어 정리 밀어 넣기</td>
+<td>RAG 대신 데이터를 학습시켜 나중에 지식을 꺼내 쓰기</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>커스텀 토큰은 원래 문장 사이사이에 끼워 들어가므로 출력을 조절하기 쉽다.</li>
+<li>지식 주입이 어려운 이유: 주로 쓰는 LoRA, QLoRA에서는 <strong>지식(패턴)이 담긴 MLP, 트랜스포머 블록이 동결</strong>돼 있고 어댑터만 학습하므로, 용어 정도는 조금 되지만 확 주입되지는 않는다. MoE 구조 때문에도 어렵고, 작은 모델(SLM) 파인튜닝은 더 애매하다. <strong>풀 웨이트 파인튜닝</strong>이면 어느 정도 될 수 있지만 GPU 제약 때문에 현실적으로는 QLoRA를 쓴다.</li>
+<li>결론: 파인튜닝은 신중히. 파인튜닝은 <strong>지식 주입보다 대화 패턴 지정</strong>에 가깝고, 지식은 <strong>Skills, RAG, 프롬프트에 직접 주입</strong>하는 방식이 더 잘 동작할 수 있다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-3">→ RAG: 임베딩 검색과 ChromaDB</a></li>
+<li>모델이 <strong>더 긴 문장을 좋게 보는</strong> 길이 편향도 최근 모델은 파인튜닝 과정에서 일부 제거돼 덜하다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-6">→ 에이전트 평가와 LLM-as-a-judge</a></li>
+</ul>
+<!-- -->
+
+<aside class="callout sum">
+<p><strong>정리</strong> 파인튜닝은 구조, 용어 같은 얕은 데이터에는 잘 듣고, 지식을 강하게 밀어 넣는 데는 약하다. 지식은 RAG가 낫다.</p>
+</aside>
+<h3 id="ch-4-양자화와-데이터-타입">양자화와 데이터 타입</h3>
+<ul>
+<li>원본 모델의 가중치 타입은 <strong>float32</strong>(고전적인 모델)나 <strong>bfloat16</strong>(구글이 만든 타입)이다. 부동소수점은 지수부(자릿수 표현)와 가수부(정밀도 표현)로 나뉘고, float16과 bfloat16은 이 배분이 다르다. bfloat16은 float32와 같은 8비트 지수부를 쓰고 가수부를 줄여, 표현 범위는 넓고 정밀도는 낮다. 이런 float 타입 가중치를 가진 것이 원본 파일이다.</li>
+<li>계산을 빠르게 하고 공유하기 쉽게 Ollama 등에서는 <strong>양자화(INT4, INT8)</strong>된 모델을 공유한다. Ollama로 테스트하는 모델도 양자화된 모델이다.</li>
+<li>면접 질문 예: "양자화했을 때 어떤 지표를 봐야 하나?"</li>
+</ul>
+<h3 id="ch-4-lora-qlora-동결된-블록-모래시계-어댑터">LoRA, QLoRA: 동결된 블록 + 모래시계 어댑터</h3>
+<ul>
+<li><strong>QLoRA = Quantization + Low-Rank Adaptation</strong>이다. 16GB GPU 하나로도 가능한, SLM을 <strong>가장 적은 자원으로</strong> 학습하는 방식이다. 트랜스포머 모델을 <strong>4비트로 양자화</strong>하고 <strong>freeze</strong>(가중치 업데이트를 막음)한 뒤 <strong>어댑터를 붙여 어댑터만 파인튜닝</strong>한다.</li>
+<li>구조는 다음과 같다.<ol>
+<li>원본 SLM(BF16 등)을 가져와 <strong>INT4/INT8로 양자화</strong>한다.</li>
+<li>블록(MLP 쪽)을 <strong>freeze</strong>한다. 가중치가 학습되지 않게 고정한다.</li>
+<li>그 아래에 <strong>모래시계 모양의 어댑터</strong>(LoRA)를 그린다. 학습시킬 작은 레이어를 추가하는 것이다.</li>
+<li>원본 블록의 가중치는 고정되고 어댑터 가중치만 학습된다. <strong>두 출력을 합쳐</strong> 단어를 예측한다.</li>
+</ol>
+</li>
+</ul>
+<pre><code>입력 ─┬─▶ [동결, 양자화된 원본 블록] ─────┐
+      │                                ├─▶ 두 출력을 합쳐 → 단어 예측
+      └─▶ [모래시계 어댑터 (학습 대상)] ─┘
+</code></pre>
+<ul>
+<li>"파인튜닝은 모델을 학습시키는 것 아닌가?" 싶지만, 실제로는 원본 모델은 얼어 있고 가중치가 적은 어댑터만 학습한다. 대부분의 파인튜닝이 이렇게 진행되는 이유는 <strong>GPU가 부족</strong>하기 때문이다. 큰 모델은 고사하고 작은 모델도 이렇게 해야 한다.</li>
+<li>SFT를 하는 두 방법:</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>방법</th>
+<th>설명</th>
+<th>누가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>전체 파라미터 튜닝</td>
+<td>사전학습에 가까운 작업이라 공개 모델로 하기 어렵다. 지식 주입도 대부분 가능하다</td>
+<td>OpenAI, 업스테이지, 카카오 같은 모델 개발 회사</td>
+</tr>
+<tr>
+<td>QLoRA 어댑터 튜닝</td>
+<td>동결 + 어댑터</td>
+<td>활용 쪽 회사에서 "파인튜닝 한번 해 봐"라고 하면 대부분 이것</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>전체 파라미터를 튜닝하는 게 아니라면 대부분 <strong>LoRA나 QLoRA</strong>로 하고, 이 기법으로 커스텀 토큰을 학습시켜 쓴다.</li>
+<li>LoRA의 "Low-Rank"는 큰 가중치 행렬의 변화량을 작은 행렬 두 개의 곱으로 근사한다는 뜻이다. 모래시계 모양은 차원을 줄였다가 다시 늘리는 이 구조를 그린 것이다.</li>
+</ul>
+<h3 id="ch-4-sft-풀이-과정까지-정답으로-가르치기">SFT: 풀이 과정까지 정답으로 가르치기</h3>
+<ul>
+<li>강화학습이 <strong>수학 문제 풀이에 강력</strong>해서 수학 문제를 예로 든다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>예시</strong> "24개가 있다. 그중 3분의 1을 팔고, 남은 것의 절반을 먹었다. 지금 몇 개냐?" 풀이: 24 × 1/3 = 8개를 팔고 16개가 남는다. 16개의 반을 먹으면 <strong>8개</strong>가 남는다. 정답 8.</p>
+</aside>
+<ul>
+<li><strong>SFT</strong>는 정답만 맞추게 하는 게 아니라 <strong>풀이 과정("24개 중 8개를 팔았다 → 16개 → 반을 먹으면 8개") + 정답</strong>을 output으로 학습시킨다. 즉 <strong>정답을 알려 준 것</strong>이라 원하는 답은 이미 모델에 학습돼 있다.</li>
+<li>같은 방식으로 "A 업무를 할 때는 이것, 이것, 이것 순서로 진행해라" 같은 <strong>CoT 형태 지시</strong>도 학습시킬 수 있다.</li>
+<li><strong>가이드 데이터셋</strong>: 직접 파인튜닝하지 않더라도 업무 최적화용 데이터셋을 만들 수 있다. SLM은 thinking이 있어도 일을 정확히 못하는 경우가 많기 때문이다. 예: "데이터를 받으면 먼저 A 문서를 확인하고, 그다음 B 문서, C 문서를 확인하라"처럼 "이런 식으로 일하면 좋겠다"는 데이터를 thinking 형식으로 만든다.</li>
+</ul>
+<h3 id="ch-4-강화학습-여러-번-생성-보상-함수로-채점-가중치-반영">강화학습: 여러 번 생성 → 보상 함수로 채점 → 가중치 반영</h3>
+<ul>
+<li>SFT만 하면 <strong>베스트 답을 잘 못 만든다.</strong> CoT 기반으로만 학습시켰을 때 정답률이 70%까지 오르는 건 맞지만 한계가 있다. 그래서 더 정확히 맞추려고 <strong>강화학습</strong>을 도입했다. SLM, LLM 모두 파인튜닝 성능을 크게 올린 방법 중 하나다.</li>
+<li>절차:<ol>
+<li><strong>후보군 생성</strong>: 같은 입력을 여러 번(예: 4번) 넣어 답을 만든다. <strong>생성 모델이라 넣을 때마다 답이 바뀐다</strong>는 성질을 이용한다.</li>
+<li>잘한 답, 애매한 답, 틀린 답이 정리된다.</li>
+<li><strong>보상 함수(reward function)</strong>로 정답이 얼마나 잘 맞았는지 체크한다. 설계는 우리에게 달렸다.</li>
+<li><strong>성적표</strong>를 만든다. 예: 1번 12점, 2번 5점, 3번 0점.</li>
+<li>이 성적표를 <strong>모델 가중치에 반영해 학습</strong>한다.</li>
+</ol>
+</li>
+</ul>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>후보</th>
+<th>생성된 답</th>
+<th>채점 방향</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1번</td>
+<td>"24÷3=8, 24−8=16, 16÷2=8 → 정답 8"</td>
+<td>풀이도 정답도 맞음 (예: 5점 + 5점)</td>
+</tr>
+<tr>
+<td>2번</td>
+<td>"정답 8" (풀이 없음)</td>
+<td>정답만 맞음</td>
+</tr>
+<tr>
+<td>3번</td>
+<td>"8로 나눠서 3…"</td>
+<td>틀린 답</td>
+</tr>
+<tr>
+<td>4번</td>
+<td>"1.5…"</td>
+<td>엉뚱한 답</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>보상 함수 설계: <strong>룰 기반</strong>(정답이 8이니 8을 맞췄냐)과 <strong>풀이 과정 평가</strong>(다른 LLM 등으로 풀이가 얼마나 맞았는지 점수)가 있다. 정답을 알고 있으니 정답 여부와 풀이 정확도를 나눠 점수를 매기고, 얼마나 잘 맞췄는지에 대한 <strong>가중치(알파)</strong> 같은 것을 곱해 총 보상 점수를 낸다.</li>
+<li><strong>사람 → 자동화</strong>: 원래 이 채점을 사람이 했다. 최초 GPT(ChatGPT)를 만들 때는 사람이 "뭐가 좋은 답변이다"를 알려 줬다(RLHF에 해당). 이후 <strong>PPO, GRPO</strong> 같은 방법이 나오며 자동화됐다. 모델이 만든 답을 보상 함수로 점수 매기고, 이는 "정답이 있는지 없는지"로 만들어진다.</li>
+<li>이 점수를 강화학습의 평가 함수로 써서 진행한다. 강화학습에는 <strong>액터-크리틱(Actor-Critic)</strong>처럼 행동하면 보상을 주는 부분이 있고, loss 함수가 모델 쪽에 붙으면 업데이트된다. 강화학습 내용이라 여기서는 깊이 들어가지 않는다.</li>
+<li><strong>평가자가 누구냐가 매우 중요하다.</strong> SLM이라면 LLM이나 더 큰 모델이 평가할수록 보상이 정확하게 들어가고, 그만큼 thinking을 훨씬 잘하게 된다. 상위 모델들로 답변을 평가해 피드백을 주는 방식이다.</li>
+<li>RL 중 모델 답변에는 <strong>thinking과 answer 토큰까지 함께</strong> 들어간다(thinking이 비어 있는 2번 같은 답도 있다). 이 구조로 <strong>수십만 번 반복</strong>하면 토큰을 언제 예측해야 할지, 문제를 어떻게 풀어야 할지를 모델이 찾아내, SFT로 알려 준 내용을 바탕으로 <strong>새로운 문제도 풀어낸다.</strong> 코딩, 수학, 논리 문제를 푸는 thinking 모델들이 이렇게 학습한다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout sum">
+<p><strong>정리</strong> 강화학습은 "모델 답변을 평가해서 그 점수로 학습하는 것"이다. 그래서 평가 파트와 매우 비슷할 수밖에 없다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-6">→ 에이전트 평가와 LLM-as-a-judge</a></p>
+</aside>
+<h3 id="ch-4-강화학습의-설계-포인트와-연구-흐름">강화학습의 설계 포인트와 연구 흐름</h3>
+<ul>
+<li>핵심:<ul>
+<li><strong>보상 함수를 어떻게 구성하는지</strong></li>
+<li>얼마나 정확하게, <strong>어떤 형식으로 평가</strong>하는지</li>
+<li><strong>언어 등이 얼마나 일관적인지</strong></li>
+<li>생성 결과와 강화학습을 얼마나 잘 평가할지</li>
+<li>학습할 때 그걸 <strong>얼마나 세게 반영할지</strong></li>
+</ul>
+</li>
+<li>"강화학습을 어떻게 반영하는지가 지금 학습의 아주 큰 부분" 정도만 체크하면 된다. 모델 회사들은 임베딩, 어텐션, MoE 구조를 만드는 일까지 포함해 이걸 계속 실험, 테스트한다. 작업량이 엄청나고 GPU가 없으면 못 하는 <strong>프런티어</strong> 방식이다.</li>
+<li>트렌드: <strong>모델 크기를 키우는 시대는 거의 끝나 가고</strong>, "어떻게 잘 학습시키느냐"가 중심이다. 여기서 가장 영향력 있는 것이 강화학습이고, 지금 가장 연구가 많이 되는 분야다(Agentic RL 등).</li>
+<li>새 기법도 계속 나온다. 예전에 DeepSeek가 <strong>GRPO</strong>를 내놓았지만 긴 컨텍스트에서는 성능이 떨어지는 등 문제가 드러나 대안이 계속 나오고 있다. 이것은 연구 주제가 될 수도 있고, 새 모델을 고를 때 비교 기준이 될 수도 있다.</li>
+<li>최근에는 <strong>강화학습 툴</strong>이 나와 있고 모델을 돌리는 것도 정형화돼 있어, <strong>데이터셋만 있으면 같은 코드로 튜닝을 반복</strong>할 수 있다. 한 번 만들어 두면 데이터셋만 바꿔 진행하면 된다.</li>
+</ul>
+<h3 id="ch-4-증류distillation와-비밀-레시피">증류(Distillation)와 "비밀 레시피"</h3>
+<ul>
+<li>최근 가장 각광받는 연구가 모델 <strong>증류(distillation)</strong>, 즉 데이터 증류다. <strong>Teacher-Student</strong> 모델을 만들어 한 모델의 데이터를 다른 모델이 학습하게 한다. 이때 LLM의 어텐션 파트나 데이터 분포 파트를 동작시키고, 그 결과를 받은 모델이 학습하는 방식으로 많이 진행한다. 생성 모델 쪽에서는 teacher-student 방식 학습이 많이 발전했다.</li>
+<li>SFT에는 <strong>질문-답 쌍(pair)을 만드는 작업</strong>이 있다. 새 프런티어 모델이 나오면 그 모델에게 "우리가 학습해야 하는 질문과 답변 형식을 만들어라" 해서 뽑아낸 데이터로 SFT를 시킨다. 이것을 증류라고 한다. 구조화된 출력으로 상위 모델에서 system/user/assistant 구조의 데이터를 뽑아 다른 모델을 다시 학습시키는 방법론도 있다.</li>
+<li>큰 모델이 어떻게 생각했는지 뽑아내 학습하고 그걸 GRPO 등으로 강화학습하면, 큰 모델이 어떻게 thinking하는지를 작은 모델이 다시 학습하게 된다. 큰 모델을 최대한 베껴 <strong>비슷한 분포</strong>를 만들면 강화학습도 잘 되고 성능도 좋아진다. 반대로 작은 SLM이 <strong>증류 없이 RL만 잘해도</strong> 생각보다 thinking을 잘하더라는 연구도 있다.</li>
+</ul>
+<!-- -->
+
+<aside class="callout ex">
+<p><strong>비유</strong> <strong>비밀 레시피</strong>: 모델 가중치는 공개되지만 <strong>어떻게 학습했는지는 공개되지 않는다.</strong> 그래서 어떤 데이터를 학습했는지 뽑아내려 한다. 학습한 모델은 그 내용을 그대로 만들어 낼 수 있으니, 실제 분포에서 샘플링을 아주 많이 해서 최대한 근사하면 비슷한 데이터가 된다.</p>
+</aside>
+<ul>
+<li>현실: 최신 프런티어 모델이 나오면 많은 회사가 SFT에 쓰려고 답을 대량 생성한다. 그게 새 데이터이자 자산이 된다. 데이터가 워낙 많아 큰 모델→작은 모델 증류가 잘 동작하고, 작은 모델은 알려진 데이터셋으로 RL만 해도 잘 동작한다는 이야기도 있다. 좋은 모델이 나올수록 <strong>SLM 성능도 계속 좋아진다.</strong></li>
+<li><strong>전문 모델 → 일반 모델</strong>: Solar 공개 발표에도 나오는 사후 훈련(post-training) 이야기다. 수학, 과학 같은 특정 분야 전문가들이 만든 데이터로 <strong>전문 모델</strong>을 학습시키고, 그 모델의 지식을 추출해 다시 학습시켜 <strong>일반 모델</strong>을 만든다(증류에 해당하는 흐름). 그래서 도메인 지식과 전문가 데이터가 점점 중요해질 것이다.</li>
+<li>면접 질문 예: "디스틸할 때 어떤 분포를 가지고 해야 하나?"</li>
+</ul>
+<h3 id="ch-4-파인튜닝-실패-증상과-대응">파인튜닝 실패 증상과 대응</h3>
+<p>학습이 잘못됐을 때 자주 보이는 출력이다. 기존 모델은 잘 되다가 파인튜닝 뒤 이런 증상이 생기면 튜닝이 잘못돼 <strong>오버피팅</strong>이 발생한 것으로 보면 된다.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>증상</th>
+<th>예</th>
+<th>원인</th>
+<th>대응</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>문장이 끝나지 않고 같은 말이 반복된다</td>
+<td>"나는 학교에 갑니다."에서 끝나야 하는데 "학교에 갑니다. 학교에 갑니다. …"</td>
+<td><strong>EOS 토큰을 예측하지 못함</strong></td>
+<td>temperature를 조금 올리거나, LangChain에서 LLM을 선언할 때 <strong>frequency penalty</strong>를 조절한다</td>
+</tr>
+<tr>
+<td>중간중간 외국어가 섞인다</td>
+<td>"나는 스쿨에 갑니다"</td>
+<td>파인튜닝하는 모델이 한국 모델이 아니라 외국 모델인 경우가 많다</td>
+<td>프롬프트에 "한국어로 답변해 줘"를 넣을 수 있지만, 실제로는 <strong>temperature를 낮춰야</strong> 많이 줄어든다</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>temperature가 출력 분포를 어떻게 바꾸는지는 <a class="xref" href="#ch-2">→ Transformer 블록 해부</a>. frequency penalty는 이미 많이 나온 토큰의 점수를 깎아 반복을 줄이는 생성 파라미터다.</li>
+</ul>
+<h3 id="ch-4-데이터가-70-파인튜닝-데이터-준비">데이터가 70%: 파인튜닝 데이터 준비</h3>
+<ul>
+<li>최근 Meta가 AI 개발자 절반을 데이터 만드는 데 보냈다는 논란이 있었다. 하지만 원래부터 데이터 만드는 일은 AI 개발자의 일이었다. 체감으로 <strong>모델링은 30%, 데이터 다루기가 70%</strong>다. 모델 학습은 뒷부분이고, 가장 먼저 할 일은 <strong>데이터 수집</strong>이다.</li>
+<li>도구: 파인튜닝이나 모델 제작에 관심 있다면 <strong>Hugging Face</strong>의 <code>transformers</code>와 <code>datasets</code>로 이 과정을 쉽게 진행할 수 있다. 그 코드 안에 데이터셋을 원하는 형태로 바꾸는 토크나이저 구성이 나오고, 여기에 커스텀 토큰을 추가하는 과정을 알고 있으면 AI에게 입력만 해도 구현해 준다. 실제 데이터는 <strong>JSON 형식</strong>으로 가장 많이 모은다.</li>
+<li><strong>파인튜닝 데이터와 평가 데이터는 결이 같다.</strong> 파인튜닝은 "모델이 이렇게 답했으면 좋겠다"를 담기 때문에 그 데이터로 평가까지 할 수 있다. 반대로 평가용으로 만든 데이터(어떤 툴을 부르고 어떤 thinking을 하는지)는 벤치마크로도, 학습에도 쓰인다. 잘 만들어 두면 나중에 에이전트나 모델을 만들 때 <strong>큰 자산</strong>이 된다. 딥러닝에서 가장 중요한 것은 결국 데이터다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-6">→ 에이전트 평가와 LLM-as-a-judge</a></li>
+<li>에이전트 구현 자체(LangChain이든 n8n이든 툴콜로 툴 부르기)는 어렵지 않다. 어려운 것은 <strong>내 의도대로 동작하게 하는 것</strong>이고, 이를 위해 원하는 에이전트의 모습, 동작을 정확히 알고 <strong>Q&amp;A 데이터셋</strong>을 구성하는 능력이 중요하다. 데이터셋이 없으면 에이전트는 결국 모델의 기본 성능에 기대어 동작한다. 정확한 Q&amp;A 데이터셋으로 평가하고 trace를 정리하면 의도대로 동작하게 만들 수 있다.</li>
+<li>데이터는 모으기만 해서는 부족하다. 시간이 날 때 ChatGPT나 Claude로 정제하고 검증해 세트의 결을 맞춰 두면 나중에 파인튜닝까지 넘볼 수 있다. 파인튜닝은 난이도가 꽤 있어 신중하게 들어가야 하고 데이터도 많이 모아야 한다.</li>
+</ul>
+<h3 id="ch-4-slm-파인튜닝과-메인-llm-서브-slm-구성">SLM 파인튜닝과 "메인 LLM + 서브 SLM" 구성</h3>
+<ul>
+<li>파인튜닝은 GPT 같은 대형 모델이 아니라 <strong>작은 모델(SLM)을 직접 튜닝해 검증하는</strong> 흐름이다. SLM 튜닝 자체는 주로 모델링 파트(모델러)가 한다.</li>
+<li>활용 아키텍처: 메인 에이전트는 ChatGPT, Claude 같은 좋은 모델로, <strong>서브에이전트는 SLM</strong>으로 두어 비용을 낮춘다. 이런 아키텍처를 구현해 배포하는 일도 포함된다. → <a class="xref" href="agentic-ai-2-agent-features.html#ch-5">→ 서브에이전트, 멀티에이전트, 워크플로</a> <a class="xref" href="agentic-ai-4-tools-practice.html#ch-1">→ 모델 고르기와 여러 모델 조합</a></li>
+<li>SLM 서빙 도구: <strong>vLLM, llama.cpp, Ollama</strong>.</li>
+<li>잘 튜닝된 SLM은 일반 대화 성능은 떨어져도 <strong>특정 태스크나 의도한 기능은 생각보다 잘 수행한다.</strong> 회사 서버에서 돌리거나, 작은 회사가 자기 특화 데이터로 특화 패턴이나 기능을 만들고 싶을 때 파인튜닝 데이터셋을 구성한다.</li>
+</ul></div></section>
+
+
+
+<footer class="note">
+<p>개인 학습 기록으로 정리한 노트입니다. 이해한 범위에서 정리했기 때문에 틀린 내용이 있을 수 있습니다.</p><p>2026-11-19</p>
+</footer>
+</main>
+<div class="otp-col" id="otpCol">
+  <nav class="otp" id="otp" aria-label="이 장의 소주제">
+    <div class="otp-head">이 장의 소주제</div>
+    <div class="otp-ch" id="otpCh"></div>
+    <ol id="otpList"></ol>
+  </nav>
+</div>
+</div>
+<button class="otp-btn" id="otpBtn" type="button">소주제 목차</button>
+<script>
+(function(){
+  var root=document.documentElement;
+  var tb=document.getElementById('themeBtn');
+  if(tb){  // no toggle button -> page simply follows the system light/dark setting
+    try{var t=localStorage.getItem('lec-theme');if(t)root.setAttribute('data-theme',t);}catch(e){}
+    tb.addEventListener('click',function(){
+      var cur=root.getAttribute('data-theme');
+      if(!cur){cur=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}
+      var next=cur==='dark'?'light':'dark';
+      root.setAttribute('data-theme',next);
+      try{localStorage.setItem('lec-theme',next);}catch(e){}
+    });
+  }
+  var side=document.getElementById('side'),mb=document.getElementById('menuBtn');
+  mb.addEventListener('click',function(){side.classList.toggle('open');mb.textContent=side.classList.contains('open')?'목차 닫기':'목차 열기';});
+  document.querySelectorAll('#toc a').forEach(function(a){a.addEventListener('click',function(){side.classList.remove('open');mb.textContent='목차 열기';});});
+  var lecs=document.querySelectorAll('details.lec');
+  var oa=document.getElementById('openAll'),ca=document.getElementById('closeAll');
+  if(oa)oa.onclick=function(){lecs.forEach(function(d){d.open=true;});};
+  if(ca)ca.onclick=function(){lecs.forEach(function(d){d.open=false;});};
+  function openHash(){var h=location.hash;if(h&&h.indexOf('#lec-')===0){var d=document.querySelector(h);if(d&&d.tagName==='DETAILS'){d.open=true;d.scrollIntoView();}}}
+  window.addEventListener('hashchange',openHash);openHash();
+  var links={};document.querySelectorAll('#toc a').forEach(function(a){links[a.getAttribute('href').slice(1)]=a;});
+  var secs=Object.keys(links).map(function(id){return document.getElementById(id);}).filter(Boolean);
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){Object.values(links).forEach(function(a){a.classList.remove('active');});var a=links[e.target.id];if(a)a.classList.add('active');}});},{rootMargin:'-20% 0px -70% 0px'});
+    secs.forEach(function(s){io.observe(s);});
+  }
+  // floating panel: sub-topics (h3) of the chapter currently on screen
+  var chapters=[].slice.call(document.querySelectorAll('section.chapter'));
+  var otp=document.getElementById('otp'),otpCol=document.getElementById('otpCol'),otpList=document.getElementById('otpList'),
+      otpCh=document.getElementById('otpCh'),otpBtn=document.getElementById('otpBtn');
+  var curCh=null,curA=null,heads=[],hlinks=[];
+  function fill(ch){
+    curCh=ch;curA=null;heads=[];hlinks=[];otpList.innerHTML='';
+    if(!ch){otp.classList.remove('show');otpBtn.classList.remove('show');otpCol.classList.remove('open');return;}
+    var no=ch.querySelector('.ch-no'),h2=ch.querySelector('h2');
+    otpCh.textContent=(no?no.textContent.split('\u00b7')[0].trim()+'. ':'')+(h2?h2.textContent:'');
+    heads=[].slice.call(ch.querySelectorAll('.prose h3[id]'));
+    heads.forEach(function(h){
+      var li=document.createElement('li'),a=document.createElement('a');
+      a.href='#'+h.id;a.innerHTML=h.innerHTML;
+      a.addEventListener('click',function(){otpCol.classList.remove('open');});
+      li.appendChild(a);otpList.appendChild(li);hlinks.push(a);
+    });
+    otp.scrollTop=0;otp.classList.add('show');otpBtn.classList.add('show');
+  }
+  function spy(){
+    var line=window.innerHeight*0.3,found=null;
+    for(var i=0;i<chapters.length;i++){var r=chapters[i].getBoundingClientRect();if(r.top<=line&&r.bottom>line){found=chapters[i];break;}}
+    if(found!==curCh)fill(found);
+    if(!found)return;
+    var idx=-1;
+    for(var j=0;j<heads.length;j++){if(heads[j].getBoundingClientRect().top<=120)idx=j;else break;}
+    var a=idx>=0?hlinks[idx]:null;
+    if(a!==curA){
+      if(curA)curA.classList.remove('active');
+      curA=a;
+      if(a){a.classList.add('active');
+        var t=a.offsetTop;if(t<otp.scrollTop+40||t>otp.scrollTop+otp.clientHeight-40)otp.scrollTop=t-otp.clientHeight/3;}
+    }
+  }
+  var ticking=false;
+  window.addEventListener('scroll',function(){if(!ticking){ticking=true;requestAnimationFrame(function(){ticking=false;spy();});}},{passive:true});
+  window.addEventListener('resize',spy);
+  otpBtn.addEventListener('click',function(e){e.stopPropagation();otpCol.classList.toggle('open');});
+  document.addEventListener('click',function(e){if(otpCol.classList.contains('open')&&!otpCol.contains(e.target))otpCol.classList.remove('open');});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')otpCol.classList.remove('open');});
+  spy();
+})();
+</script>
+</body>
+</html>
